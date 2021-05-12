@@ -1,0 +1,115 @@
+version: '2.1'
+
+services:
+  # $ mysql -uroot -h127.0.0.1 -p
+  mysql_plm:
+    image: mysql:5.7
+    mem_limit: 350m
+    ports:
+      - "13306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=msa
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  mysql_product:
+    image: mysql:5.7
+    mem_limit: 350m
+    ports:
+      - "13307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=msa
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  mysql_customer:
+    image: mysql:5.7
+    mem_limit: 350m
+    ports:
+      - "13308:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=msa
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost" ]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  mysql_service:
+    image: mysql:5.7
+    mem_limit: 350m
+    ports:
+      - "13309:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=msa
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-uuser", "-ppwd", "-h", "localhost" ]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  product:
+    build: microservices/product-service/product-server
+    mem_limit: 350m
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+    depends_on:
+      mysql_product:
+        condition: service_healthy
+
+  plm:
+    build: microservices/plm-service/plm-server
+    mem_limit: 350m
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+    depends_on:
+      mysql_plm:
+        condition: service_healthy
+
+  customer:
+    build: microservices/customer-service/customer-server
+    mem_limit: 350m
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+    depends_on:
+      mysql_customer:
+        condition: service_healthy
+
+  service:
+    build: microservices/service-service/service-server
+    mem_limit: 350m
+    ports:
+      - "8084:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - TZ=Asia/Seoul
+    depends_on:
+      mysql_service:
+        condition: service_healthy
