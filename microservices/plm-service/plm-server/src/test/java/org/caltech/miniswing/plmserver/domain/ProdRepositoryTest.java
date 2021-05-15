@@ -1,6 +1,7 @@
 package org.caltech.miniswing.plmserver.domain;
 
 import org.caltech.miniswing.plmclient.dto.SvcProdCd;
+import org.caltech.miniswing.plmserver.test.ProdFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,9 +24,9 @@ public class ProdRepositoryTest {
 
     @Before
     public void setUp() {
-        prodRepository.saveAll(createManyProds_1());
-        prodRepository.saveAll(createManyProds_2());
-        prodRepository.saveAll(createManyProds_3());
+        prodRepository.saveAll(ProdFactory.createManyProds_1());
+        prodRepository.saveAll(ProdFactory.createManyProds_2());
+        prodRepository.saveAll(ProdFactory.createManyProds_3());
     }
 
     @After
@@ -62,29 +63,4 @@ public class ProdRepositoryTest {
         assertThat(prods.get(3).getProdNm()).isEqualTo("Flo");
     }
 
-
-    public static List<Prod> createManyProds_1() {
-        return Arrays.asList(
-                Prod.builder().prodId("NA00000001").prodNm("표준요금제").svcProdCd(SvcProdCd.P1).description("111").build(),
-                Prod.builder().prodId("NA00000002").prodNm("기본요금제").svcProdCd(SvcProdCd.P1).description("111").build(),
-                Prod.builder().prodId("NA00000003").prodNm("스페셜").svcProdCd(SvcProdCd.P1).description("111").build()
-        );
-    }
-
-    public static List<Prod> createManyProds_2() {
-        return Arrays.asList(
-                Prod.builder().prodId("NA00000004").prodNm("부가요금제1").svcProdCd(SvcProdCd.P2).description("111").build(),
-                Prod.builder().prodId("NA00000005").prodNm("부가요금제2").svcProdCd(SvcProdCd.P2).description("111").build()
-        );
-
-    }
-
-    public static List<Prod> createManyProds_3() {
-        return Arrays.asList(
-                Prod.builder().prodId("NA00000006").prodNm("V컬러링").svcProdCd(SvcProdCd.P3).description("111").build(),
-                Prod.builder().prodId("NA00000007").prodNm("Wavve").svcProdCd(SvcProdCd.P3).description("111").build(),
-                Prod.builder().prodId("NA00000008").prodNm("Flo").svcProdCd(SvcProdCd.P3).description("111").build()
-        );
-
-    }
 }

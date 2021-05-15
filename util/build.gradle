@@ -28,7 +28,9 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-web")
+	// tomcat 뜬다
+	//implementation("org.springframework.boot:spring-boot-starter-web")
+	// netty 뜬다
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	testImplementation('io.projectreactor:reactor-test')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -38,8 +40,7 @@ dependencies {
 
 	// jpa용
 	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-	//implementation('mysql:mysql-connector-java')
-	implementation('com.h2database:h2')
+	implementation('mysql:mysql-connector-java')
 	testImplementation('com.h2database:h2')
 
 	// lombok

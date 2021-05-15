@@ -3,6 +3,7 @@ package org.caltech.miniswing.plmserver.web;
 import org.caltech.miniswing.plmclient.dto.SvcProdCd;
 import org.caltech.miniswing.plmserver.domain.ProdRepository;
 import org.caltech.miniswing.plmserver.dto.ProdCreateRequestDto;
+import org.caltech.miniswing.plmserver.test.ProdFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -17,6 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,8 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql({"/data.sql"})
-@Ignore
 public class ProdControllerTest {
     @LocalServerPort
     private int port;
@@ -41,6 +41,9 @@ public class ProdControllerTest {
 
     @Before
     public void setUp() {
+        prodRepository.saveAll(ProdFactory.createManyProds_1());
+        prodRepository.saveAll(ProdFactory.createManyProds_2());
+        prodRepository.saveAll(ProdFactory.createManyProds_3());
     }
 
     @After
@@ -49,7 +52,7 @@ public class ProdControllerTest {
     }
 
     @Test
-    public void test_상품단건조회() throws Exception {
+    public void test_상품단건조회() {
         client.get()
                 .uri(uriBuilder ->
                         uriBuilder.path(urlPrefix + "/{prodId}")
@@ -67,7 +70,7 @@ public class ProdControllerTest {
     }
 
     @Test
-    public void test_상품전체조회()  throws Exception{
+    public void test_상품전체조회() {
         client.get()
                 .uri(urlPrefix)
                     .accept(APPLICATION_JSON)
@@ -88,7 +91,7 @@ public class ProdControllerTest {
     }
 
     @Test
-    public void test_상품명으로조회() throws Exception {
+    public void test_상품명으로조회() {
         client.get()
                 .uri(uriBuilder ->
                         uriBuilder.path(urlPrefix)
@@ -106,7 +109,7 @@ public class ProdControllerTest {
     }
 
     @Test
-    public void test_상품ID여러개로조회() throws Exception {
+    public void test_상품ID여러개로조회() {
         client.get()
                 .uri(uriBuilder ->
                         uriBuilder.path(urlPrefix)
@@ -128,7 +131,7 @@ public class ProdControllerTest {
     }
 
     @Test
-    public void test_상품생성() throws Exception {
+    public void test_상품생성()  {
         ProdCreateRequestDto dto = ProdCreateRequestDto.builder()
                 .prodId("NI00000001")
                 .prodNm("가나다")

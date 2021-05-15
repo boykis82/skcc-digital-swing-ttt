@@ -7,6 +7,8 @@ import org.caltech.miniswing.productclient.dto.ProdSubscribeRequestDto;
 import org.caltech.miniswing.productserver.domain.SvcProd;
 import org.caltech.miniswing.productserver.domain.SvcProdRepository;
 import org.caltech.miniswing.serviceclient.ServiceClient;
+import org.caltech.miniswing.serviceclient.dto.SvcResponseDto;
+import org.caltech.miniswing.serviceclient.dto.SvcStCd;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,18 +64,51 @@ public class ProdControllerTest {
         svcProdRepository.deleteAll();
     }
 
+    @Test
+    public void test_상품가입_해지된서비스()  {
+        //-- mock에서 해지된 서비스 리턴
+        given( serviceClient.getService(svcMgmtNum) )
+                .willReturn( Mono.just(
+                        SvcResponseDto.builder()
+                                .svcMgmtNum(svcMgmtNum)
+                                .svcStCd(SvcStCd.TG)
+                                .build()
+                ) );
+
+        ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
+                .prodId("NA00000005")
+                .svcProdCd(SvcProdCd.P3)
+                .build();
+
+        client.post()
+                .uri(urlPrefix + "/products")
+                .accept(APPLICATION_JSON)
+                .body(BodyInserters.fromValue(dto))
+                .exchange()
+                .expectStatus().is5xxServerError();     //-- global error handler가 안 먹는다.. 도무지 모르겠다.
+    }
 
     @Test
-    public void test_상품가입() throws Exception {
+    public void test_상품가입_부가서비스() {
         String prodId = "NA00000007";
+
+        //-- mock에서 살아있는 서비스 리턴
+        given( serviceClient.getService(svcMgmtNum) )
+                .willReturn( Mono.just(
+                        SvcResponseDto.builder()
+                                .svcMgmtNum(svcMgmtNum)
+                                .svcStCd(SvcStCd.AC)
+                                .build()
+                ) );
+
+        //-- mock에서 빈 값 리턴
+        given( serviceClient.changeBasicProduct(svcMgmtNum, prodId) )
+                .willReturn(Mono.empty().then());
 
         ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
                 .prodId(prodId)
                 .svcProdCd(SvcProdCd.P3)
                 .build();
-
-        given( serviceClient.changeBasicProduct(svcMgmtNum, prodId) )
-                .willReturn(Mono.empty().then());
 
         client.post()
                 .uri(urlPrefix + "/products")
@@ -87,16 +122,24 @@ public class ProdControllerTest {
     }
 
     @Test
-    public void test_상품가입_기본요금제() throws Exception {
+    public void test_상품가입_기본요금제() {
         String prodId = "NA00000002";
+
+        given( serviceClient.getService(svcMgmtNum) )
+                .willReturn( Mono.just(
+                        SvcResponseDto.builder()
+                                .svcMgmtNum(svcMgmtNum)
+                                .svcStCd(SvcStCd.AC)
+                                .build()
+                ) );
+
+        given( serviceClient.changeBasicProduct(svcMgmtNum, prodId) )
+                .willReturn(Mono.empty().then());
 
         ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
                 .prodId(prodId)
                 .svcProdCd(SvcProdCd.P1)
                 .build();
-
-        given( serviceClient.changeBasicProduct(svcMgmtNum, prodId) )
-                .willReturn(Mono.empty().then());
 
         client.post()
                 .uri(urlPrefix + "/products")
@@ -112,7 +155,7 @@ public class ProdControllerTest {
 
 
     @Test
-    public void test_가입상품조회() throws Exception {
+    public void test_가입상품조회() {
         given( plmClient.getProdNmByIds( Arrays.asList("NA00000001", "NA00000006") ) )
                         .willReturn( Mono.just(Arrays.asList(
                                 ProdResponseDto.builder().prodId("NA00000001").prodNm("표준요금제").build(),
@@ -135,10 +178,18 @@ public class ProdControllerTest {
 
 
     @Test
-    public void test_상품해지() throws Exception {
+    public void test_상품해지() {
         assertThat(svcProdRepository.findAllSvcProds(svcMgmtNum)).hasSize(2);
         List<SvcProd> activeSvcProds = svcProdRepository.findActiveSvcProds(svcMgmtNum);
         assertThat(activeSvcProds).hasSize(2);
+
+        given( serviceClient.getService(svcMgmtNum) )
+                .willReturn( Mono.just(
+                        SvcResponseDto.builder()
+                                .svcMgmtNum(svcMgmtNum)
+                                .svcStCd(SvcStCd.AC)
+                                .build()
+                ) );
 
         client.delete()
                 .uri(urlPrefix +  "/products/" + activeSvcProds.get(1).getId())

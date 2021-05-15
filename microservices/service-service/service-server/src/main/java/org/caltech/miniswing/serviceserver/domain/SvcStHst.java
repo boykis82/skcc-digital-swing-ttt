@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 public class SvcStHst  extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @ManyToOne
     @JoinColumn(name = "svc_mgmt_num")

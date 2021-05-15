@@ -5,7 +5,6 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
-		jcenter()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -27,7 +26,6 @@ ext {
 
 repositories {
 	mavenCentral()
-	jcenter()
 }
 
 dependencies {
@@ -36,9 +34,11 @@ dependencies {
 
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	// tomcat 뜬다
+	//implementation("org.springframework.boot:spring-boot-starter-web")
+	// netty 뜬다
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	testImplementation('io.projectreactor:reactor-test')
-	implementation("org.springframework.boot:spring-boot-starter-web")
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 
 	//implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
@@ -55,7 +55,6 @@ dependencies {
 	// jpa용
 	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
 	implementation('mysql:mysql-connector-java')
-	implementation('com.h2database:h2')
 	testImplementation('com.h2database:h2')
 
 	// lombok

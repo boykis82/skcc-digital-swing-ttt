@@ -87,6 +87,9 @@ public class SvcProd  extends BaseEntity {
         if (!force && SvcProdCd.P1 == svcProdCd) {
             throw new InvalidInputException("기본요금제는 해지 불가!");
         }
+        if( wasTerminated() ) {
+            throw new InvalidInputException("이미 해지된 상품은 또 해지 불가!");
+        }
         effEndDtm = termDtm;
         termDt = termDtm.toLocalDate();
     }
@@ -95,7 +98,13 @@ public class SvcProd  extends BaseEntity {
         return termDt == null;
     }
 
+    public boolean wasTerminated() {
+        return termDt != null;
+    }
+
     public boolean isSubscribingProd(String prodId) {
         return this.prodId.equals(prodId) && isActive();
     }
+
+    public boolean isBasicProd() { return this.svcProdCd == SvcProdCd.P1; }
 }

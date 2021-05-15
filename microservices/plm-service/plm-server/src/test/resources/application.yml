@@ -1,0 +1,16 @@
+spring.profiles.include: testdb
+
+server.error.include-message: always
+
+logging:
+  level:
+    root: INFO
+    org.caltech.miniswing: DEBUG
+    com:
+      querydsl:
+        sql: DEBUG
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace

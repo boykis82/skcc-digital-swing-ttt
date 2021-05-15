@@ -7,7 +7,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 
 import java.time.ZonedDateTime;
 
-@Getter
 public class HttpErrorInfo {
     private final ZonedDateTime timestamp;
     private final String path;
@@ -30,7 +29,7 @@ public class HttpErrorInfo {
         return httpStatus.getReasonPhrase();
     }
 
-    public static HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, ServerHttpRequest request, Exception ex) {
+    public static HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, ServerHttpRequest request, Throwable ex) {
         final String path = request.getPath().pathWithinApplication().value();
         final String message = ex.getMessage();
 

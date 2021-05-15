@@ -28,16 +28,16 @@ import java.util.Optional;
 @Slf4j
 
 public class AppConfig {
-    @Value("${app.svc-service.host}")
+    @Value("${app.svc-service.host: 127.0.0.1}")
     private String svcHost;
 
-    @Value("${app.svc-service.port}")
+    @Value("${app.svc-service.port: 8080}")
     private int svcPort;
 
-    @Value("${app.plm-service.host}")
+    @Value("${app.plm-service.host: 127.0.0.1}")
     private String plmHost;
 
-    @Value("${app.plm-service.port}")
+    @Value("${app.plm-service.port: 8080}")
     private int plmPort;
 
     @Bean

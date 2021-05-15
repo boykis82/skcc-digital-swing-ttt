@@ -29,16 +29,16 @@ import java.util.Optional;
 @EnableJpaAuditing
 @Slf4j
 public class AppConfig {
-    @Value("${app.plm-service.host}")
+    @Value("${app.plm-service.host:127.0.0.1}")
     private String plmHost;
 
-    @Value("${app.plm-service.port}")
+    @Value("${app.plm-service.port:8080}")
     private int plmPort;
 
-    @Value("${app.prod-service.host}")
+    @Value("${app.prod-service.host:127.0.0.1}")
     private String prodHost;
 
-    @Value("${app.prod-service.port}")
+    @Value("${app.prod-service.port:8080}")
     private int prodPort;
 
     @Bean

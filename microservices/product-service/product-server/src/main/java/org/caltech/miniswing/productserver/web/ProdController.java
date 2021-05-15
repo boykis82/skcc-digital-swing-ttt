@@ -1,5 +1,6 @@
 package org.caltech.miniswing.productserver.web;
 
+import org.caltech.miniswing.exception.InvalidInputException;
 import org.caltech.miniswing.plmclient.PlmClient;
 import org.caltech.miniswing.plmclient.dto.ProdResponseDto;
 import org.caltech.miniswing.plmclient.dto.SvcProdCd;
@@ -7,6 +8,7 @@ import org.caltech.miniswing.productclient.dto.ProdSubscribeRequestDto;
 import org.caltech.miniswing.productclient.dto.SvcProdResponseDto;
 import org.caltech.miniswing.productserver.service.ProdService;
 import org.caltech.miniswing.serviceclient.ServiceClient;
+import org.caltech.miniswing.serviceclient.dto.SvcStCd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -31,15 +33,21 @@ public class ProdController {
     @PostMapping("/{svcMgmtNum}/products")
     public Mono<Void> subscribeProduct(@PathVariable("svcMgmtNum") long svcMgmtNum,
                                        @RequestBody ProdSubscribeRequestDto dto) {
-        if (SvcProdCd.P1 == dto.getSvcProdCd()) {
-            //-- 상품이력 꺾어주고 새로운 상품이력 넣는 것과, 서비스 서버 상의 기본요금제 변경은 상관관계가 없다고 본다. 따라서 when 사용... 인데 나중에 saga 적용하려면 어떻게 해야 하려나
-            return Mono.when(
-                    prodService.subscribeProduct(svcMgmtNum, dto),
-                    serviceClient.changeBasicProduct(svcMgmtNum, dto.getProdId())
-            ).log().then();
-        } else {
-            return prodService.subscribeProduct(svcMgmtNum, dto);
-        }
+        return serviceClient.getService(svcMgmtNum)
+                .zipWhen(svc -> {
+                    if (svc.getSvcStCd() != SvcStCd.AC && svc.getSvcStCd() != SvcStCd.SP) {
+                        return Mono.error(new InvalidInputException("서비스가 해지되어 상품 가입 불가! svc_mgmt_num = " + svcMgmtNum));
+                    }
+                    if (SvcProdCd.P1 == dto.getSvcProdCd()) {
+                        //-- 상품이력 꺾어주고 새로운 상품이력 넣는 것과, 서비스 서버 상의 기본요금제 변경은 상관관계가 없다고 본다. 따라서 when 사용... 인데 나중에 saga 적용하려면 어떻게 해야 하려나
+                        return Mono.when(
+                                prodService.subscribeProduct(svcMgmtNum, dto),
+                                serviceClient.changeBasicProduct(svcMgmtNum, dto.getProdId())
+                        ).then().log();
+                    } else {
+                        return prodService.subscribeProduct(svcMgmtNum, dto).log();
+                    }
+                }, (svc, v) -> v);
     }
 
     @GetMapping("/{svcMgmtNum}/products")
@@ -65,7 +73,13 @@ public class ProdController {
     @DeleteMapping("/{svcMgmtNum}/products/{svcProdId}")
     public Mono<Void> terminateProduct(@PathVariable("svcMgmtNum") long svcMgmtNum,
                                        @PathVariable("svcProdId") long svcProdId) {
-        return prodService.terminateProduct(svcMgmtNum, svcProdId);
+        return serviceClient.getService(svcMgmtNum)
+                .zipWhen(svc -> {
+                    if (svc.getSvcStCd() != SvcStCd.AC && svc.getSvcStCd() != SvcStCd.SP) {
+                        return Mono.error(new InvalidInputException("서비스가 해지되어 상품 해지 불가! svc_mgmt_num = " + svcMgmtNum));
+                    }
+                    return prodService.terminateProduct(svcMgmtNum, svcProdId);
+                }, (svc, v) -> v);
     }
 
     //-- private api (svc 해지시 호출)
