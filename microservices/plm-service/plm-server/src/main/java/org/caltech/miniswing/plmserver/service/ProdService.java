@@ -42,7 +42,7 @@ public class ProdService {
     @Transactional(readOnly = true)
     public Mono<ProdResponseDto> getProduct(String prodId) {
         return asyncHelper.mono( () ->
-                Mono.just(prodRepository.findById(prodId))
+                Mono.fromCallable( () -> prodRepository.findById(prodId))
                         .map(oc -> oc.orElseThrow(() -> new NotFoundDataException("상품이 없습니다.! prod_id = " + prodId)))
                         .map(prodResponseMapper::entityToDto)
                         .log()
@@ -79,7 +79,7 @@ public class ProdService {
     @Transactional
     public Mono<ProdResponseDto> createProduct(ProdCreateRequestDto dto) {
         return asyncHelper.mono( () ->
-                Mono.just(prodRepository.save(prodCreateRequestMapper.dtoToEntity(dto)))
+                Mono.fromCallable( () -> prodRepository.save(prodCreateRequestMapper.dtoToEntity(dto)))
                         .map(prodResponseMapper::entityToDto)
                         .log()
         );

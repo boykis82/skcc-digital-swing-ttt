@@ -32,50 +32,50 @@ public class ProdService {
 
     @Transactional
     public Mono<Void> subscribeProduct(long svcMgmtNum, ProdSubscribeRequestDto dto) {
-        return asyncHelper.mono( () -> Mono.just(svcProdRepository.findActiveSvcProds(svcMgmtNum)) )
+        return asyncHelper.mono( () -> Mono.fromCallable( () -> svcProdRepository.findActiveSvcProds(svcMgmtNum)) )
                 .zipWhen(svcProds -> {
                     Svc svc = Svc.builder()
                             .svcMgmtNum(svcMgmtNum)
                             .svcProds(svcProds)
                             .build();
 
-                    return asyncHelper.mono( () -> Mono.just(
+                    return asyncHelper.mono( () -> Mono.fromCallable( () ->
                             svcProdRepository.saveAll(svc.subscribeProduct(dto.getProdId(), dto.getSvcProdCd()))) ).then();
                 }, (_a_, _b) -> _b).log();
     }
 
     @Transactional
     public Mono<Void> terminateProduct(long svcMgmtNum, long svcProdId) {
-        Svc svc = Svc.builder()
-                .svcMgmtNum(svcMgmtNum)
-                .svcProds(svcProdRepository.findActiveSvcProds(svcMgmtNum))
-                .build();
+        return asyncHelper.mono( () -> Mono.fromCallable( () -> svcProdRepository.findActiveSvcProds(svcMgmtNum)) )
+                .zipWhen(svcProds -> {
+                    Svc svc = Svc.builder()
+                            .svcMgmtNum(svcMgmtNum)
+                            .svcProds(svcProds)
+                            .build();
 
-        return asyncHelper.mono( () ->
-                Mono.just(svcProdRepository.saveAll(svc.terminateProduct(svcProdId)))
-                        .then()
-                        .log()
-        );
+                    return asyncHelper.mono( () -> Mono.fromCallable( () ->
+                            svcProdRepository.saveAll(svc.terminateProduct(svcProdId))) ).then().log();
+                }, (_a_, _b) -> _b).log();
     }
 
     @Transactional
     public Mono<Void> terminateAllProducts(long svcMgmtNum) {
-        Svc svc = Svc.builder()
-                .svcMgmtNum(svcMgmtNum)
-                .svcProds(svcProdRepository.findActiveSvcProds(svcMgmtNum))
-                .build();
+        return asyncHelper.mono( () -> Mono.fromCallable( () -> svcProdRepository.findActiveSvcProds(svcMgmtNum)) )
+                .zipWhen(svcProds -> {
+                    Svc svc = Svc.builder()
+                            .svcMgmtNum(svcMgmtNum)
+                            .svcProds(svcProds)
+                            .build();
 
-        return asyncHelper.mono( () ->
-                Mono.just(svcProdRepository.saveAll(svc.terminateAllProducts()))
-                        .then()
-                        .log()
-        );
+                    return asyncHelper.mono( () -> Mono.fromCallable( () ->
+                            svcProdRepository.saveAll(svc.terminateAllProducts())) ).then().log();
+                }, (_a_, _b) -> _b).log();
     }
 
     @Transactional(readOnly = true)
     public Mono<List<SvcProdResponseDto>> getServiceProducts(long svcMgmtNum, boolean includeTermProd) {
         return asyncHelper.mono( () ->
-                Mono.just(includeTermProd
+                Mono.fromCallable( () -> includeTermProd
                         ? svcProdResponseMapper.entityListToDtoList(svcProdRepository.findAllSvcProds(svcMgmtNum))
                         : svcProdResponseMapper.entityListToDtoList(svcProdRepository.findActiveSvcProds(svcMgmtNum))
                 )

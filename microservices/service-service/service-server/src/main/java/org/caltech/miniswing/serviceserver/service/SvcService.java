@@ -51,7 +51,7 @@ public class SvcService {
     @Transactional(readOnly = true)
     public Mono<SvcResponseDto> getService(long svcMgmtNum) {
         return asyncHelper.mono( () ->
-                Mono.just(
+                Mono.fromCallable( () ->
                         svcResponseMapper.entityToDto(
                                 svcRepository.findById(svcMgmtNum)
                                              .orElseThrow( () -> new NotFoundDataException("서비스가 없습니다.! svc_mgmt_num = " + svcMgmtNum) ))
@@ -73,29 +73,31 @@ public class SvcService {
         Svc s = svcCreateRequestMapper.dtoToEntity(dto);
         s.subscribe(LocalDateTime.now());
         return asyncHelper.mono( () ->
-                Mono.just(
+                Mono.fromCallable( () ->
                         svcResponseMapper.entityToDto(svcRepository.save(s)))
         ).log();
     }
 
     @Transactional
     public Mono<Void> updateService(long svcMgmtNum, SvcUpdateRequestDto dto) {
-        return asyncHelper.mono( () -> _updateService(svcMgmtNum, dto) ).log();
+        return asyncHelper.mono( () -> _updateService(svcMgmtNum, dto).log() );
     }
 
     private Mono<Void> _updateService(long svcMgmtNum, SvcUpdateRequestDto dto) {
-        Svc s = svcRepository.findByIdWithSvcStHsts(svcMgmtNum)
-                .orElseThrow(() -> new NotFoundDataException("서비스가 없습니다.! svc_mgmt_num = " + svcMgmtNum));
-        if (SVC_STATUS_UPDATE == dto.getSvcUpdateTyp()) {
-            updateServiceStatus(s, dto.getAfterSvcStCd());
-        } else if (FEE_PROD_UPDATE == dto.getSvcUpdateTyp()) {
-            updateFeeProd(s, dto.getAfterFeeProdId());
-        } else {
-            throw new InvalidInputException("알 수 없는 서비스 변경 구분입니다!");
-        }
-        svcRepository.save(s);
+        return Mono.fromCallable( () -> svcRepository.findByIdWithSvcStHsts(svcMgmtNum) )
+                .zipWhen(s_ -> {
+                    Svc s = s_.orElseThrow(() -> new NotFoundDataException("서비스가 없습니다.! svc_mgmt_num = " + svcMgmtNum));
 
-        return Mono.empty().then();     //-- 이상하다..
+                    if (SVC_STATUS_UPDATE == dto.getSvcUpdateTyp()) {
+                        updateServiceStatus(s, dto.getAfterSvcStCd());
+                    } else if (FEE_PROD_UPDATE == dto.getSvcUpdateTyp()) {
+                        updateFeeProd(s, dto.getAfterFeeProdId());
+                    } else {
+                        throw new InvalidInputException("알 수 없는 서비스 변경 구분입니다!");
+                    }
+
+                    return asyncHelper.mono( () -> Mono.fromCallable(() -> svcRepository.save(s)) .then());
+                }, (s, v) -> v);
     }
 
     private void updateServiceStatus(Svc s, SvcStCd afterSvcStCd) {

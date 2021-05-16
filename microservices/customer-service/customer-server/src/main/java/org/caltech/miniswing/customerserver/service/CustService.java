@@ -48,7 +48,7 @@ public class CustService {
     @Transactional(readOnly = true)
     public Mono<CustResponseDto> getCustomer(long custNum) {
         return asyncHelper.mono( () ->
-                Mono.just(custRepository.findById(custNum))
+                Mono.fromCallable( () -> custRepository.findById(custNum))
                         .map(oc -> oc.orElseThrow(() -> new NotFoundDataException("고객이 없습니다.! cust_num = " + custNum)))
                         .map(custResponseMapper::entityToDto)
                         .log()
@@ -69,7 +69,7 @@ public class CustService {
         Cust c = custCreateRequestMapper.dtoToEntity(dto);
         c.setCustRgstDt(LocalDate.now());
         return asyncHelper.mono( () ->
-                Mono.just(custRepository.save(c))
+                Mono.fromCallable( () -> custRepository.save(c))
                         .map(custResponseMapper::entityToDto)
                         .log()
         );
