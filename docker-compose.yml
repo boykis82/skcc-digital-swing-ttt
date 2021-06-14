@@ -80,8 +80,6 @@ services:
   prod:
     build: microservices/product-service/product-server
     mem_limit: 350m
-    ports:
-      - "7003:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
@@ -92,8 +90,6 @@ services:
   plm:
     build: microservices/plm-service/plm-server
     mem_limit: 350m
-    ports:
-      - "7002:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
@@ -104,8 +100,6 @@ services:
   customer:
     build: microservices/customer-service/customer-server
     mem_limit: 350m
-    ports:
-      - "7001:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
@@ -116,11 +110,21 @@ services:
   service:
     build: microservices/service-service/service-server
     mem_limit: 350m
-    ports:
-      - "7004:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
     depends_on:
       mysql-service:
         condition: service_healthy
+
+  gateway:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: spring-cloud/gateway
+    mem_limit: 350m
+    ports:
+      - "8080:8080"
+
+  eureka:
+    build: spring-cloud/eureka-server
+    mem_limit: 350m

@@ -28,7 +28,7 @@ public class PlmService {
             return webClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/products")
+                            .path("/plm")
                             .queryParam("prodIds", String.join(",", prodIds))
                             .build())
                     .retrieve()

@@ -25,13 +25,13 @@ public class ProductService {
         }
 
         @Override
-        public Mono<Void> subscribeProduct(long svcMgmtNum, ProdSubscribeRequestDto dto) {
-            log.info("ProductService.client.subscribeProduct. svcMgmtNum = {}, dto = {}", svcMgmtNum, dto);
+        public Mono<Void> subscribeProduct(ProdSubscribeRequestDto dto) {
+            log.info("ProductService.client.subscribeProduct. dto = {}", dto);
             return webClient
                     .post()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/services/{svcMgmtNum}/products")
-                            .build(svcMgmtNum))
+                            .path("/products")
+                            .build())
                     .body(BodyInserters.fromValue(dto))
                     .retrieve()
                     .bodyToMono(Void.class);
@@ -43,21 +43,23 @@ public class ProductService {
             return webClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/services/{svcMgmtNum}/products")
+                            .path("/products")
+                            .queryParam("svcMgmtNum", svcMgmtNum)
                             .queryParam("includeTermProd", includeTermProd)
-                            .build(svcMgmtNum))
+                            .build())
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<SvcProdResponseDto>>() {});
         }
 
         @Override
         public Mono<Void> terminateProduct(long svcMgmtNum, long svcProdId) {
-            log.info("ProductService.client.terminateProduct. svcMgmtNum = {}, svcProdId = {}", svcMgmtNum, svcProdId);
+            log.info("ProductService.client.terminateProduct. svcProdId = {}", svcProdId);
             return webClient
                     .delete()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/services/{svcMgmtNum}/products/{svcProdId}")
-                            .build(svcMgmtNum, svcProdId))
+                            .path("/products/{svcProdId}")
+                            .queryParam("svcMgmtNum", svcMgmtNum)
+                            .build(svcProdId))
                     .retrieve()
                     .bodyToMono(Void.class);
         }
@@ -68,8 +70,9 @@ public class ProductService {
             return webClient
                     .delete()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/services/{svcMgmtNum}/products")
-                            .build(svcMgmtNum))
+                            .path("/products")
+                            .queryParam("svcMgmtNum", svcMgmtNum)
+                            .build())
                     .retrieve()
                     .bodyToMono(Void.class);
         }

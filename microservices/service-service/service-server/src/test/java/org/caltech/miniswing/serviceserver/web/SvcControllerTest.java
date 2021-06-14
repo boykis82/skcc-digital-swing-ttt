@@ -39,7 +39,10 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"eureka.client.enabled=false"}
+)
 @Slf4j
 public class SvcControllerTest {
     @LocalServerPort
@@ -87,7 +90,7 @@ public class SvcControllerTest {
                 .feeProdId(prods.get(0))
                 .build();
 
-        given( productClient.subscribeProduct(anyLong(), any(ProdSubscribeRequestDto.class)) )
+        given( productClient.subscribeProduct(any(ProdSubscribeRequestDto.class)) )
                 .willReturn(Mono.empty().then());
 
         client.post()
@@ -158,7 +161,7 @@ public class SvcControllerTest {
         Svc s = subscribeSampleSvc();
         String afterProdId = "NA00000003";
 
-        given( productClient.subscribeProduct(anyLong(), any(ProdSubscribeRequestDto.class)) )
+        given( productClient.subscribeProduct(any(ProdSubscribeRequestDto.class)) )
                 .willReturn(Mono.empty().then());
 
         client.put()

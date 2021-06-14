@@ -127,4 +127,30 @@ spring init \
 --version=1.0.0-SNAPSHOT \
 util
 
+mkdir spring-cloud
+cd spring-cloud
+spring init \
+--boot-version=2.3.2.RELEASE \
+--build=gradle \
+--java-version=1.8 \
+--packaging=jar \
+--name=util \
+--package-name=org.caltech.miniswing.eurekaserver \
+--groupId=org.caltech.miniswing.eurekaserver \
+--dependencies=actuator,webflux \
+--version=1.0.0-SNAPSHOT \
+eureka-server
 
+spring init \
+--boot-version=2.3.2.RELEASE \
+--build=gradle \
+--java-version=1.8 \
+--packaging=jar \
+--name=util \
+--package-name=org.caltech.miniswing.gateway \
+--groupId=org.caltech.miniswing.gateway \
+--dependencies=actuator,webflux \
+--version=1.0.0-SNAPSHOT \
+gateway
+
+cd ..

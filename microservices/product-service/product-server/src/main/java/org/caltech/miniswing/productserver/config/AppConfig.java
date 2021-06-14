@@ -8,7 +8,10 @@ import org.caltech.miniswing.serviceclient.ServiceClient;
 import org.caltech.miniswing.serviceclient.ServiceService;
 import org.caltech.miniswing.util.AsyncHelper;
 import org.caltech.miniswing.util.EnumMapper;
+import org.caltech.miniswing.util.http.FilteredWebClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -28,18 +31,6 @@ import java.util.Optional;
 @Slf4j
 
 public class AppConfig {
-    @Value("${app.svc-service.host: 127.0.0.1}")
-    private String svcHost;
-
-    @Value("${app.svc-service.port: 8080}")
-    private int svcPort;
-
-    @Value("${app.plm-service.host: 127.0.0.1}")
-    private String plmHost;
-
-    @Value("${app.plm-service.port: 8080}")
-    private int plmPort;
-
     @Bean
     public AuditorAware<String> auditorAware() {
         return () -> Optional.of("강인수");
@@ -55,70 +46,32 @@ public class AppConfig {
         return new AsyncHelper(scheduler);
     }
 
+    @LoadBalanced
+    @Bean
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
+    }
+
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+
+    private WebClient plmWebClient;
+    private WebClient svcWebClient;
+
     @Bean
     public WebClient svcWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://" + svcHost + ":" + svcPort + "/swing/api/v1")
-                .filter(
-                        (req, next) -> next.exchange(
-                                ClientRequest.from(req).header("from", "webclient").build()
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofRequestProcessor(
-                                clientRequest -> {
-                                    log.info(">>>>>>>>>> REQUEST <<<<<<<<<<");
-                                    log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-                                    clientRequest.headers().forEach(
-                                            (name, values) -> values.forEach(value -> log.info("{} : {}", name, value))
-                                    );
-                                    return Mono.just(clientRequest);
-                                }
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofResponseProcessor(
-                                clientResponse -> {
-                                    log.info(">>>>>>>>>> RESPONSE <<<<<<<<<<");
-                                    clientResponse.headers().asHttpHeaders().forEach((name, values) -> values.forEach(value -> log.info("{} : {}", name, value)));
-                                    return Mono.just(clientResponse);
-                                }
-                        )
-                )
-                .build();
+        if (svcWebClient == null) {
+            svcWebClient = FilteredWebClient.create(webClientBuilder, "http://service/swing/api/v1");
+        }
+        return svcWebClient;
     }
 
     @Bean
     public WebClient plmWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://" + plmHost + ":" + plmPort + "/swing/api/v1")
-                .filter(
-                        (req, next) -> next.exchange(
-                                ClientRequest.from(req).header("from", "webclient").build()
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofRequestProcessor(
-                                clientRequest -> {
-                                    log.info(">>>>>>>>>> REQUEST <<<<<<<<<<");
-                                    log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-                                    clientRequest.headers().forEach(
-                                            (name, values) -> values.forEach(value -> log.info("{} : {}", name, value))
-                                    );
-                                    return Mono.just(clientRequest);
-                                }
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofResponseProcessor(
-                                clientResponse -> {
-                                    log.info(">>>>>>>>>> RESPONSE <<<<<<<<<<");
-                                    clientResponse.headers().asHttpHeaders().forEach((name, values) -> values.forEach(value -> log.info("{} : {}", name, value)));
-                                    return Mono.just(clientResponse);
-                                }
-                        )
-                )
-                .build();
+        if (plmWebClient == null) {
+            plmWebClient = FilteredWebClient.create(webClientBuilder, "http://plm/swing/api/v1");
+        }
+        return plmWebClient;
     }
 
     @Bean

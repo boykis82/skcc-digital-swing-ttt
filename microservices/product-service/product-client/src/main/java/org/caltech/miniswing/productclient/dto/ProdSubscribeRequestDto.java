@@ -8,13 +8,15 @@ import org.caltech.miniswing.plmclient.dto.SvcProdCd;
 @Getter
 @ToString
 public class ProdSubscribeRequestDto {
+    private long svcMgmtNum;
     private String prodId;
     private SvcProdCd svcProdCd;
 
     @Builder
-    public ProdSubscribeRequestDto(String prodId,
+    public ProdSubscribeRequestDto(long svcMgmtNum,
+                                   String prodId,
                                    SvcProdCd svcProdCd) {
-
+        this.svcMgmtNum = svcMgmtNum;
         this.prodId = prodId;
         this.svcProdCd = svcProdCd;
     }

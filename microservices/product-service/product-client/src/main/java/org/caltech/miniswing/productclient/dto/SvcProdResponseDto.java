@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @ToString
 public class SvcProdResponseDto {
     private long id;
+    private long svcMgmtNum;
     private String prodId;
     private String prodNm;
 
@@ -21,8 +22,9 @@ public class SvcProdResponseDto {
     private LocalDate termDt;
 
     @Builder
-    public SvcProdResponseDto(long id, String prodId, String prodNm, LocalDate scrbDt, LocalDate termDt) {
+    public SvcProdResponseDto(long id, long svcMgmtNum, String prodId, String prodNm, LocalDate scrbDt, LocalDate termDt) {
         this.id = id;
+        this.svcMgmtNum = svcMgmtNum;
         this.prodId = prodId;
         this.prodNm = prodNm;
         this.scrbDt = scrbDt;

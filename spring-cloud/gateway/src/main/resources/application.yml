@@ -1,0 +1,88 @@
+server.port: 8080
+
+spring.application.name: gateway
+
+app.eureka-server: localhost
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka-server}:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
+ribbon.ServerListRefreshInterval: 5000
+ribbon.NFLoadBalancerPingInterval: 5
+
+spring.cloud.gateway.routes:
+  - id: eureka-api
+    uri: http://${app.eureka-server}:8761
+    predicates:
+      - Path=/eureka/api/{segment}
+    filters:
+      - SetPath=/eureka/{segment}
+
+  - id: eureka-web-start
+    uri: http://${app.eureka-server}:8761
+    predicates:
+      - Path=/eureka/web
+    filters:
+      - SetPath=/
+
+  - id: eureka-web-other
+    uri: http://${app.eureka-server}:8761
+    predicates:
+      - Path=/eureka/**
+
+  - id: service
+    uri: lb://service
+    predicates:
+      - Path=/service/**
+    filters:
+      - RewritePath=/service/(?<path>.*),/$\{path}
+
+  - id: plm
+    uri: lb://plm
+    predicates:
+      - Path=/plm/**
+    filters:
+      - RewritePath=/plm/(?<path>.*),/$\{path}
+
+  - id: product
+    uri: lb://product
+    predicates:
+      - Path=/product/**
+    filters:
+      - RewritePath=/product/(?<path>.*),/$\{path}
+
+  - id: customer
+    uri: lb://customer
+    predicates:
+      - Path=/customer/**
+    filters:
+      - RewritePath=/customer/(?<path>.*),/$\{path}
+
+  - id: composite
+    uri: lb://gateway
+    predicates:
+      - Path=/composite/**
+    filters:
+      - RewritePath=/composite/(?<path>.*),/$\{path}
+
+
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
+    org.springframework.cloud.gateway: TRACE
+
+---
+spring.profiles: docker
+
+app.eureka-server: eureka

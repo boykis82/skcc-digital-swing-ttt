@@ -31,11 +31,11 @@ public class ProdService {
     }
 
     @Transactional
-    public Mono<Void> subscribeProduct(long svcMgmtNum, ProdSubscribeRequestDto dto) {
-        return asyncHelper.mono( () -> Mono.fromCallable( () -> svcProdRepository.findActiveSvcProds(svcMgmtNum)) )
+    public Mono<Void> subscribeProduct(ProdSubscribeRequestDto dto) {
+        return asyncHelper.mono( () -> Mono.fromCallable( () -> svcProdRepository.findActiveSvcProds(dto.getSvcMgmtNum())) )
                 .zipWhen(svcProds -> {
                     Svc svc = Svc.builder()
-                            .svcMgmtNum(svcMgmtNum)
+                            .svcMgmtNum(dto.getSvcMgmtNum())
                             .svcProds(svcProds)
                             .build();
 

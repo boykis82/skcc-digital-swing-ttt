@@ -31,7 +31,10 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"eureka.client.enabled=false"}
+)
 public class ProdControllerTest {
     @LocalServerPort
     private int port;
@@ -56,7 +59,7 @@ public class ProdControllerTest {
     public void setUp() {
         svcMgmtNum = subscribeSampleSvc();
 
-        urlPrefix = "http://localhost:" + port + "/swing/api/v1/services/" + svcMgmtNum;
+        urlPrefix = "http://localhost:" + port + "/swing/api/v1/products";
     }
 
     @After
@@ -76,12 +79,13 @@ public class ProdControllerTest {
                 ) );
 
         ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
+                .svcMgmtNum(svcMgmtNum)
                 .prodId("NA00000005")
                 .svcProdCd(SvcProdCd.P3)
                 .build();
 
         client.post()
-                .uri(urlPrefix + "/products")
+                .uri(urlPrefix)
                 .accept(APPLICATION_JSON)
                 .body(BodyInserters.fromValue(dto))
                 .exchange()
@@ -106,12 +110,13 @@ public class ProdControllerTest {
                 .willReturn(Mono.empty().then());
 
         ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
+                .svcMgmtNum(svcMgmtNum)
                 .prodId(prodId)
                 .svcProdCd(SvcProdCd.P3)
                 .build();
 
         client.post()
-                .uri(urlPrefix + "/products")
+                .uri(urlPrefix)
                     .accept(APPLICATION_JSON)
                 .body(BodyInserters.fromValue(dto))
                 .exchange()
@@ -137,12 +142,13 @@ public class ProdControllerTest {
                 .willReturn(Mono.empty().then());
 
         ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
+                .svcMgmtNum(svcMgmtNum)
                 .prodId(prodId)
                 .svcProdCd(SvcProdCd.P1)
                 .build();
 
         client.post()
-                .uri(urlPrefix + "/products")
+                .uri(urlPrefix)
                 .accept(APPLICATION_JSON)
                 .body(BodyInserters.fromValue(dto))
                 .exchange()
@@ -163,15 +169,17 @@ public class ProdControllerTest {
                         ));
 
         client.get()
-                .uri(urlPrefix +  "/products?includeTermProd=false")
+                .uri(urlPrefix +  "?svcMgmtNum=" + svcMgmtNum + "&includeTermProd=false")
                     .accept(APPLICATION_JSON)
                 .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(APPLICATION_JSON)
                     .expectBody()
                     .jsonPath("$.length()").isEqualTo(2)
+                    .jsonPath("$[0].svcMgmtNum").isEqualTo(svcMgmtNum)
                     .jsonPath("$[0].prodId").isEqualTo("NA00000001")
                     .jsonPath("$[0].prodNm").isEqualTo("표준요금제")
+                    .jsonPath("$[1].svcMgmtNum").isEqualTo(svcMgmtNum)
                     .jsonPath("$[1].prodId").isEqualTo("NA00000006")
                     .jsonPath("$[1].prodNm").isEqualTo("Flo");
     }
@@ -192,7 +200,7 @@ public class ProdControllerTest {
                 ) );
 
         client.delete()
-                .uri(urlPrefix +  "/products/" + activeSvcProds.get(1).getId())
+                .uri(urlPrefix +  "/" + activeSvcProds.get(1).getId() + "?svcMgmtNum=" + svcMgmtNum)
                     .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()

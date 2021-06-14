@@ -1,6 +1,7 @@
 package org.caltech.miniswing.serviceserver.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.caltech.miniswing.plmclient.PlmClient;
 import org.caltech.miniswing.plmclient.PlmService;
@@ -11,7 +12,10 @@ import org.caltech.miniswing.serviceclient.ServiceService;
 import org.caltech.miniswing.serviceclient.dto.SvcStCd;
 import org.caltech.miniswing.util.AsyncHelper;
 import org.caltech.miniswing.util.EnumMapper;
+import org.caltech.miniswing.util.http.FilteredWebClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -28,50 +32,26 @@ import java.util.Optional;
 @Configuration
 @EnableJpaAuditing
 @Slf4j
+@Getter
 public class AppConfig {
-    @Value("${app.plm-service.host:127.0.0.1}")
-    private String plmHost;
+    @LoadBalanced
+    @Bean
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
+    }
 
-    @Value("${app.plm-service.port:8080}")
-    private int plmPort;
+    @Autowired
+    private WebClient.Builder webClientBuilder;
 
-    @Value("${app.prod-service.host:127.0.0.1}")
-    private String prodHost;
-
-    @Value("${app.prod-service.port:8080}")
-    private int prodPort;
+    private WebClient plmWebClient;
+    private WebClient productWebClient;
 
     @Bean
     public WebClient plmWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://" + plmHost + ":" + plmPort + "/swing/api/v1")
-                .filter(
-                        (req, next) -> next.exchange(
-                                ClientRequest.from(req).header("from", "webclient").build()
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofRequestProcessor(
-                                clientRequest -> {
-                                    log.info(">>>>>>>>>> REQUEST <<<<<<<<<<");
-                                    log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-                                    clientRequest.headers().forEach(
-                                            (name, values) -> values.forEach(value -> log.info("{} : {}", name, value))
-                                    );
-                                    return Mono.just(clientRequest);
-                                }
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofResponseProcessor(
-                                clientResponse -> {
-                                    log.info(">>>>>>>>>> RESPONSE <<<<<<<<<<");
-                                    clientResponse.headers().asHttpHeaders().forEach((name, values) -> values.forEach(value -> log.info("{} : {}", name, value)));
-                                    return Mono.just(clientResponse);
-                                }
-                        )
-                )
-                .build();
+        if (plmWebClient == null) {
+            plmWebClient = FilteredWebClient.create(webClientBuilder, "http://plm/swing/api/v1");
+        }
+        return plmWebClient;
     }
 
     @Bean
@@ -81,35 +61,10 @@ public class AppConfig {
 
     @Bean
     public WebClient productWebClient() {
-        return WebClient.builder()
-                .baseUrl("http://" + prodHost + ":" + prodPort + "/swing/api/v1")
-                .filter(
-                        (req, next) -> next.exchange(
-                                ClientRequest.from(req).header("from", "webclient").build()
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofRequestProcessor(
-                                clientRequest -> {
-                                    log.info(">>>>>>>>>> REQUEST <<<<<<<<<<");
-                                    log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
-                                    clientRequest.headers().forEach(
-                                            (name, values) -> values.forEach(value -> log.info("{} : {}", name, value))
-                                    );
-                                    return Mono.just(clientRequest);
-                                }
-                        )
-                )
-                .filter(
-                        ExchangeFilterFunction.ofResponseProcessor(
-                                clientResponse -> {
-                                    log.info(">>>>>>>>>> RESPONSE <<<<<<<<<<");
-                                    clientResponse.headers().asHttpHeaders().forEach((name, values) -> values.forEach(value -> log.info("{} : {}", name, value)));
-                                    return Mono.just(clientResponse);
-                                }
-                        )
-                )
-                .build();
+        if (productWebClient == null) {
+            productWebClient = FilteredWebClient.create(webClientBuilder, "http://product/swing/api/v1");
+        }
+        return productWebClient;
     }
 
     @Bean

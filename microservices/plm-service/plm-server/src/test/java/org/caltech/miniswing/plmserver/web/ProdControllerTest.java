@@ -26,7 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"eureka.client.enabled=false"}
+)
 public class ProdControllerTest {
     @LocalServerPort
     private int port;
@@ -37,7 +40,7 @@ public class ProdControllerTest {
     @Autowired
     private ProdRepository prodRepository;
 
-    private final String urlPrefix = "/swing/api/v1/products";
+    private final String urlPrefix = "/swing/api/v1/plm";
 
     @Before
     public void setUp() {

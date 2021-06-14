@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @NoArgsConstructor
-@RequestMapping("/swing/api/v1/products")
+@RequestMapping("/swing/api/v1/plm")
 public class ProdController {
     @Autowired
     private ProdService prodService;

@@ -51,11 +51,11 @@ public class SvcController {
     public Mono<SvcResponseDto> createService(@RequestBody SvcCreateRequestDto dto) {
         //-- 서비스 생성 후 서비스관리번호를 채번해야 product server로 상품가입요청을 보낼 수 있다. 순차 처리해야 하므로 zipWhen
         return svcService.createService(dto)
-                         .zipWhen(svc -> productClient.subscribeProduct(svc.getSvcMgmtNum(),
-                                                                        ProdSubscribeRequestDto.builder()
-                                                                                               .prodId(dto.getFeeProdId())
-                                                                                               .svcProdCd(SvcProdCd.P1)
-                                                                                               .build()
+                         .zipWhen(svc -> productClient.subscribeProduct(ProdSubscribeRequestDto.builder()
+                                 .svcMgmtNum(svc.getSvcMgmtNum())
+                                 .prodId(dto.getFeeProdId())
+                                 .svcProdCd(SvcProdCd.P1)
+                                 .build()
                          ).then(), (svc, v) -> svc)
                 ;
     }

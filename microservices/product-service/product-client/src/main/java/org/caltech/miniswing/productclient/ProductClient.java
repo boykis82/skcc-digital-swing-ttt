@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface ProductClient {
-    Mono<Void> subscribeProduct(long svcMgmtNum, ProdSubscribeRequestDto dto);
+    Mono<Void> subscribeProduct(ProdSubscribeRequestDto dto);
     Mono<List<SvcProdResponseDto>> getServiceProducts(long svcMgmtNum, boolean includeTermProd);
     Mono<Void> terminateProduct(long svcMgmtNum, long svcProdId);
     Mono<Void> terminateAllProducts(long svcMgmtNum);

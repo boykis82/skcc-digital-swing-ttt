@@ -20,7 +20,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(     //-- mysql57dialect로 변경한 뒤에는 datajpatest가 동작을 안한다.. 뭘까.
+        properties = {"eureka.client.enabled=false"}
+)
 public class SvcTest {
     @Autowired
     SvcRepository svcRepository;

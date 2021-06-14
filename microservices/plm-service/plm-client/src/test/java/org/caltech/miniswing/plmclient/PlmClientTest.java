@@ -54,7 +54,7 @@ public class PlmClientTest {
 
         RecordedRequest recordedRequest = mockBackEnd.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("GET");
-        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/products?prodIds=NA00000001,NA00000003");
+        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/plm?prodIds=NA00000001,NA00000003");
     }
 
 }

@@ -56,7 +56,7 @@ public class ProductClientTest {
 
         RecordedRequest recordedRequest = mockBackEnd.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("GET");
-        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/services/1/products?includeTermProd=true");
+        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/products?svcMgmtNum=1&includeTermProd=true");
     }
 
     @Test
@@ -65,12 +65,17 @@ public class ProductClientTest {
 
         StepVerifier.create(
                 ProductService.client( WebClient.create(baseUrl) )
-                        .subscribeProduct(reqSvcMgmtNum, ProdSubscribeRequestDto.builder().prodId("NA00000001").build())
+                        .subscribeProduct(
+                                ProdSubscribeRequestDto.builder()
+                                        .svcMgmtNum(reqSvcMgmtNum)
+                                        .prodId("NA00000001")
+                                        .build()
+                        )
         ).verifyComplete();
 
         RecordedRequest recordedRequest = mockBackEnd.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/services/1/products");
+        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/products");
     }
 
     @Test
@@ -84,7 +89,7 @@ public class ProductClientTest {
 
         RecordedRequest recordedRequest = mockBackEnd.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/services/1/products/2");
+        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/products/2?svcMgmtNum=1");
     }
 
     @Test
@@ -98,6 +103,6 @@ public class ProductClientTest {
 
         RecordedRequest recordedRequest = mockBackEnd.takeRequest();
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
-        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/services/1/products");
+        assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/products?svcMgmtNum=1");
     }
 }

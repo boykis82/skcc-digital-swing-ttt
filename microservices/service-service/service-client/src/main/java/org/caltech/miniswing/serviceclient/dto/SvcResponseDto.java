@@ -25,6 +25,8 @@ public class SvcResponseDto {
     private String feeProdId;
     private String feeProdNm;
 
+    private long custNum;
+
     @Builder
     public SvcResponseDto(long svcMgmtNum,
                           String svcNum,
@@ -33,7 +35,8 @@ public class SvcResponseDto {
                           SvcCd svcCd,
                           SvcStCd svcStCd,
                           String feeProdId,
-                          String feeProdNm) {
+                          String feeProdNm,
+                          long custNum) {
         this.svcMgmtNum = svcMgmtNum;
         this.svcNum = svcNum;
         this.svcScrbDt = svcScrbDt;
@@ -42,5 +45,6 @@ public class SvcResponseDto {
         this.svcStCd = svcStCd;
         this.feeProdId = feeProdId;
         this.feeProdNm = feeProdNm;
+        this.custNum = custNum;
     }
 }

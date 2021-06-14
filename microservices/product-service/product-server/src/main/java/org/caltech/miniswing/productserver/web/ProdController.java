@@ -12,14 +12,12 @@ import org.caltech.miniswing.serviceclient.dto.SvcStCd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/swing/api/v1/services")
+@RequestMapping("/swing/api/v1/products")
 public class ProdController {
     @Autowired
     private ProdService prodService;
@@ -30,28 +28,27 @@ public class ProdController {
     @Autowired
     private PlmClient plmClient;
 
-    @PostMapping("/{svcMgmtNum}/products")
-    public Mono<Void> subscribeProduct(@PathVariable("svcMgmtNum") long svcMgmtNum,
-                                       @RequestBody ProdSubscribeRequestDto dto) {
-        return serviceClient.getService(svcMgmtNum)
+    @PostMapping
+    public Mono<Void> subscribeProduct(@RequestBody ProdSubscribeRequestDto dto) {
+        return serviceClient.getService(dto.getSvcMgmtNum())
                 .zipWhen(svc -> {
                     if (svc.getSvcStCd() != SvcStCd.AC && svc.getSvcStCd() != SvcStCd.SP) {
-                        return Mono.error(new InvalidInputException("서비스가 해지되어 상품 가입 불가! svc_mgmt_num = " + svcMgmtNum));
+                        return Mono.error(new InvalidInputException("서비스가 해지되어 상품 가입 불가! svc_mgmt_num = " + dto.getSvcMgmtNum()));
                     }
                     if (SvcProdCd.P1 == dto.getSvcProdCd()) {
                         //-- 상품이력 꺾어주고 새로운 상품이력 넣는 것과, 서비스 서버 상의 기본요금제 변경은 상관관계가 없다고 본다. 따라서 when 사용... 인데 나중에 saga 적용하려면 어떻게 해야 하려나
                         return Mono.when(
-                                prodService.subscribeProduct(svcMgmtNum, dto),
-                                serviceClient.changeBasicProduct(svcMgmtNum, dto.getProdId())
-                        ).then().log();
+                                prodService.subscribeProduct(dto),
+                                serviceClient.changeBasicProduct(dto.getSvcMgmtNum(), dto.getProdId())
+                        ).then();
                     } else {
-                        return prodService.subscribeProduct(svcMgmtNum, dto).log();
+                        return prodService.subscribeProduct(dto);
                     }
                 }, (svc, v) -> v);
     }
 
-    @GetMapping("/{svcMgmtNum}/products")
-    public Mono<List<SvcProdResponseDto>> getServiceProducts(@PathVariable("svcMgmtNum") long svcMgmtNum,
+    @GetMapping
+    public Mono<List<SvcProdResponseDto>> getServiceProducts(@RequestParam(value = "svcMgmtNum") long svcMgmtNum,
                                                              @RequestParam(value = "includeTermProd") boolean includeTermProd) {
         //-- 상품정보가 n개이고 이 n개의 상품명을 가져오기 위해 plm server를 찌른다. 순차 처리해야하므로 zipWhen
         return prodService.getServiceProducts(svcMgmtNum, includeTermProd)
@@ -70,8 +67,8 @@ public class ProdController {
                 .log();
     }
 
-    @DeleteMapping("/{svcMgmtNum}/products/{svcProdId}")
-    public Mono<Void> terminateProduct(@PathVariable("svcMgmtNum") long svcMgmtNum,
+    @DeleteMapping("/{svcProdId}")
+    public Mono<Void> terminateProduct(@RequestParam("svcMgmtNum") long svcMgmtNum,
                                        @PathVariable("svcProdId") long svcProdId) {
         return serviceClient.getService(svcMgmtNum)
                 .zipWhen(svc -> {
@@ -83,8 +80,8 @@ public class ProdController {
     }
 
     //-- private api (svc 해지시 호출)
-    @DeleteMapping("/{svcMgmtNum}/products")
-    public Mono<Void> terminateAllProducts(@PathVariable("svcMgmtNum") long svcMgmtNum) {
+    @DeleteMapping
+    public Mono<Void> terminateAllProducts(@RequestParam("svcMgmtNum") long svcMgmtNum) {
         return prodService.terminateAllProducts(svcMgmtNum);
     }
 }
