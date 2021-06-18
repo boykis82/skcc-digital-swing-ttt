@@ -6,7 +6,7 @@ import org.caltech.miniswing.gateway.dto.CompositeSvcResponseDto;
 import org.caltech.miniswing.productclient.ProductClient;
 import org.caltech.miniswing.productclient.dto.SvcProdResponseDto;
 import org.caltech.miniswing.serviceclient.ServiceClient;
-import org.caltech.miniswing.serviceclient.dto.SvcResponseDto;
+import org.caltech.miniswing.serviceclient.dto.ServiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +32,7 @@ public class CompositeApi {
 
     @GetMapping("/composite-service/{svcMgmtNum}")
     public Mono<CompositeSvcResponseDto> getCompositeService(@PathVariable("svcMgmtNum") long svcMgmtNum) {
-        Mono<SvcResponseDto> svcResponseDtoMono = serviceClient.getService(svcMgmtNum);
+        Mono<ServiceDto> svcResponseDtoMono = serviceClient.getService(svcMgmtNum);
 
         Mono<List<SvcProdResponseDto>> svcProdResponseDtosMono = productClient.getServiceProducts(svcMgmtNum, false);
 
@@ -41,13 +41,13 @@ public class CompositeApi {
                 (s, c) -> c
         );
 
-        Mono<Tuple3<SvcResponseDto, CustResponseDto, List<SvcProdResponseDto>>> combined =
+        Mono<Tuple3<ServiceDto, CustResponseDto, List<SvcProdResponseDto>>> combined =
                 Mono.zip(svcResponseDtoMono, custResponseDtoMono, svcProdResponseDtosMono);
 
-        return combined.map(this::createCompositeSvcResponstDto);
+        return combined.map(this::createCompositeSvcResponseDto);
     }
 
-    private CompositeSvcResponseDto createCompositeSvcResponstDto(Tuple3<SvcResponseDto, CustResponseDto, List<SvcProdResponseDto>> tuple) {
+    private CompositeSvcResponseDto createCompositeSvcResponseDto(Tuple3<ServiceDto, CustResponseDto, List<SvcProdResponseDto>> tuple) {
         return new CompositeSvcResponseDto(tuple.getT1(), tuple.getT2(), tuple.getT3());
     }
 }

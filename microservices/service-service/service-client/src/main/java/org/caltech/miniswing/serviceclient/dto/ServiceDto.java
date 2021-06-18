@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
-public class SvcResponseDto {
+public class ServiceDto {
     private long svcMgmtNum;
     private String svcNum;
 
@@ -28,15 +28,15 @@ public class SvcResponseDto {
     private long custNum;
 
     @Builder
-    public SvcResponseDto(long svcMgmtNum,
-                          String svcNum,
-                          LocalDate svcScrbDt,
-                          LocalDate svcTermDt,
-                          SvcCd svcCd,
-                          SvcStCd svcStCd,
-                          String feeProdId,
-                          String feeProdNm,
-                          long custNum) {
+    public ServiceDto(long svcMgmtNum,
+                      String svcNum,
+                      LocalDate svcScrbDt,
+                      LocalDate svcTermDt,
+                      SvcCd svcCd,
+                      SvcStCd svcStCd,
+                      String feeProdId,
+                      String feeProdNm,
+                      long custNum) {
         this.svcMgmtNum = svcMgmtNum;
         this.svcNum = svcNum;
         this.svcScrbDt = svcScrbDt;

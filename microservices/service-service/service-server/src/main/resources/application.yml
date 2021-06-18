@@ -21,15 +21,56 @@ ribbon.NFLoadBalancerPingInterval: 5
 logging:
   level:
     root: INFO
-    org.caltech.miniswing: DEBUG
+    org.caltech.miniswing: INFO
     com:
       querydsl:
-        sql: DEBUG
+        sql: INFO
     org:
       hibernate:
         type:
           descriptor:
-            sql: trace
+            sql: INFO
+
+spring.cloud.stream:
+  defaultBinder: rabbit
+  default.contentType: application/json
+  bindings:
+    serviceOutput:
+      destination: service
+      producer:
+        required-groups: auditGroup
+
+    productInput:
+      destination: product
+      group: productSubGroup
+      consumer:
+        maxAttempts: 3
+        backOffInitialInterval: 500
+        backOffMaxInterval: 1000
+        backOffMultiplier: 2.0
+
+    billingInput:
+      destination: billing
+      group: billingSubGroup
+      consumer:
+        maxAttempts: 3
+        backOffInitialInterval: 500
+        backOffMaxInterval: 1000
+        backOffMultiplier: 2.0
+
+spring.rabbitmq:
+  host: 127.0.0.1
+  port: 5672
+  username: guest
+  password: guest
+
+spring.cloud.stream.rabbit.bindings.input-product.consumer:
+  autoBindDlq: true
+  republishToDlq: true
+
+spring.cloud.stream.rabbit.bindings.input-billing.consumer:
+  autoBindDlq: true
+  republishToDlq: true
 
 ---
 spring.profiles: docker
@@ -41,3 +82,5 @@ eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka/
 spring:
   datasource:
     url: jdbc:mysql://mysql-service/service
+
+spring.rabbitmq.host: rabbitmq

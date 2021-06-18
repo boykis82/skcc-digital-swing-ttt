@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.caltech.miniswing.exception.DataIntegrityViolationException;
 import org.caltech.miniswing.exception.InvalidInputException;
 import org.caltech.miniswing.plmclient.dto.SvcProdCd;
+import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,19 +16,20 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class Svc {
+public class SvcProds {
     private long svcMgmtNum;
     private List<SvcProd> svcProds;
 
     @Builder
-    public Svc(long svcMgmtNum, List<SvcProd> svcProds) {
+    public SvcProds(long svcMgmtNum, List<SvcProd> svcProds) {
         this.svcMgmtNum = svcMgmtNum;
         this.svcProds = svcProds;
     }
 
     public List<SvcProd> subscribeProduct(String prodId, SvcProdCd svcProdCd) {
         LocalDateTime now = LocalDateTime.now();
-        List<SvcProd> wouldBeSavedSvcProds = new ArrayList<>();
+
+        List<SvcProd> subTermSvcProds = new ArrayList<>();
 
         //-- 동일한 상품 가입되어 있으면 예외 처리
         if ( svcProds.stream().anyMatch(svcProd -> svcProd.isSubscribingProd(prodId)) ) {
@@ -48,14 +50,13 @@ public class Svc {
             else if (prevSvcProds.size() == 1) {
                 SvcProd beforeProd = prevSvcProds.get(0);
                 beforeProd.terminate(now.minusSeconds(1), true);
-                wouldBeSavedSvcProds.add(beforeProd);
+                subTermSvcProds.add(beforeProd);
             }
         }
         SvcProd newScrbProd = SvcProd.createNewSvcProd(svcMgmtNum, prodId, svcProdCd, now);
-        //this.svcProds.add(newScrbProd);
-        wouldBeSavedSvcProds.add(newScrbProd);
+        subTermSvcProds.add(newScrbProd);
 
-        return wouldBeSavedSvcProds;
+        return subTermSvcProds;
     }
 
     public List<SvcProd> terminateProduct(long svcProdId) {

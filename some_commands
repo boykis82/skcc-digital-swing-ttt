@@ -1,0 +1,34 @@
+docker compose up mysql-plm mysql-customer mysql-service mysql-product rabbitmq -d
+
+docker compose up mysql-plm mysql-customer -d
+
+docker compose up mysql-service mysql-product rabbitmq -d
+
+docker compose up mysql-service mysql-product zookeeper kafka -d
+
+Docker-compose build
+
+Docker-compose up -d
+docker compose down
+
+Docker-compose logs -f
+
+
+http://localhost:8080/eureka/web
+
+kill $(pgrep -f microservices)
+kill $(pgrep -f eureka)
+kill $(pgrep -f gateway)
+
+docker network inspect -f '{{json .Containers}}' e6c42dd5453d | jq '.[] | .Name + ":" + .IPv4Address'
+
+docker-compose exec kafka /opt/kakfa/bin/kafka-topics.sh --zookeeper zookeeper --list
+
+
+java -jar microservices/customer-service/customer-server/build/libs/*.jar &
+java -jar microservices/plm-service/plm-server/build/libs/*.jar &
+
+java -jar microservices/product-service/product-server/build/libs/*.jar &
+java -jar microservices/service-service/service-server/build/libs/*.jar &
+java -jar spring-cloud/gateway/build/libs/*.jar &
+java -jar spring-cloud/eureka-server/build/libs/*.jar &

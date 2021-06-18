@@ -10,6 +10,9 @@ import org.caltech.miniswing.productclient.ProductService;
 import org.caltech.miniswing.serviceclient.ServiceClient;
 import org.caltech.miniswing.serviceclient.ServiceService;
 import org.caltech.miniswing.serviceclient.dto.SvcStCd;
+import org.caltech.miniswing.serviceserver.messaging.MessageConsumer;
+import org.caltech.miniswing.serviceserver.messaging.MessagePublisher;
+import org.caltech.miniswing.serviceserver.service.SvcService;
 import org.caltech.miniswing.util.AsyncHelper;
 import org.caltech.miniswing.util.EnumMapper;
 import org.caltech.miniswing.util.http.FilteredWebClient;
@@ -93,5 +96,6 @@ public class AppConfig {
         enumMapper.put("svcStCd", SvcStCd.class);
         return enumMapper;
     }
+
 }
 

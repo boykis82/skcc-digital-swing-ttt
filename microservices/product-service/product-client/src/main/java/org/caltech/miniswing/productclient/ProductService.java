@@ -64,6 +64,7 @@ public class ProductService {
                     .bodyToMono(Void.class);
         }
 
+        /*
         @Override
         public Mono<Void> terminateAllProducts(long svcMgmtNum) {
             log.info("ProductService.client.terminateAllProducts. svcMgmtNum = {}", svcMgmtNum);
@@ -76,5 +77,7 @@ public class ProductService {
                     .retrieve()
                     .bodyToMono(Void.class);
         }
+
+         */
     }
 }

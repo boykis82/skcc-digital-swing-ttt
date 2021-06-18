@@ -12,5 +12,5 @@ public interface ProductClient {
     Mono<Void> subscribeProduct(ProdSubscribeRequestDto dto);
     Mono<List<SvcProdResponseDto>> getServiceProducts(long svcMgmtNum, boolean includeTermProd);
     Mono<Void> terminateProduct(long svcMgmtNum, long svcProdId);
-    Mono<Void> terminateAllProducts(long svcMgmtNum);
+    //Mono<Void> terminateAllProducts(long svcMgmtNum);
 }

@@ -1,13 +1,15 @@
 package org.caltech.miniswing.serviceclient;
 
 import lombok.extern.slf4j.Slf4j;
-import org.caltech.miniswing.serviceclient.dto.SvcResponseDto;
-import org.caltech.miniswing.serviceclient.dto.SvcUpdateRequestDto;
-import org.springframework.web.reactive.function.BodyInserter;
+import org.caltech.miniswing.serviceclient.dto.ServiceDto;
+import org.caltech.miniswing.serviceclient.dto.ServiceStatusChangeRequestDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Slf4j
 public class ServiceService {
@@ -23,23 +25,23 @@ public class ServiceService {
         }
 
         @Override
-        public Mono<SvcResponseDto> getService(long svcMgmtNum) {
-            log.info("ServiceService.client.getService. svcMgmtNum = {}", svcMgmtNum);
+        public Mono<ServiceDto> getService(long svcMgmtNum) {
+            log.info("[API] ServiceService.client.getService. svcMgmtNum = {}", svcMgmtNum);
             return webClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/services/{svcMgmtNum}")
                             .build(svcMgmtNum))
                     .retrieve()
-                    .bodyToMono(SvcResponseDto.class);
+                    .bodyToMono(ServiceDto.class);
         }
 
         @Override
-        public Flux<SvcResponseDto> getServicesByCustNum(int offset,
-                                                  int limit,
-                                                  long custNum,
-                                                  boolean includeTermSvc) {
-            log.info("ServiceService.client.getServicesByCustNum. custNum = {}, includeTermSvc = {}, offset = {}, limit = {}", custNum, includeTermSvc, offset, limit);
+        public Mono<List<ServiceDto>> getServicesByCustNum(int offset,
+                                                           int limit,
+                                                           long custNum,
+                                                           boolean includeTermSvc) {
+            log.info("[API] ServiceService.client.getServicesByCustNum. custNum = {}, includeTermSvc = {}, offset = {}, limit = {}", custNum, includeTermSvc, offset, limit);
             return webClient
                     .get()
                     .uri(uriBuilder -> uriBuilder
@@ -50,9 +52,10 @@ public class ServiceService {
                             .queryParam("limit", limit)
                             .build())
                     .retrieve()
-                    .bodyToFlux(SvcResponseDto.class);
+                    .bodyToMono(new ParameterizedTypeReference<List<ServiceDto>>() {});
         }
 
+        /*
         @Override
         public Mono<Void> activateService(long svcMgmtNum) {
             log.info("ServiceService.client.activateService. svcMgmtNum = {}", svcMgmtNum);
@@ -61,7 +64,7 @@ public class ServiceService {
                     .uri(uriBuilder -> uriBuilder
                             .path("/services/{svcMgmtNum}")
                             .build(svcMgmtNum))
-                    .body(BodyInserters.fromValue(SvcUpdateRequestDto.createActivateServiceDto()))
+                    .body(BodyInserters.fromValue(ServiceStatusChangeRequestDto.createActivateServiceDto()))
                     .retrieve()
                     .bodyToMono(Void.class);
         }
@@ -74,7 +77,7 @@ public class ServiceService {
                     .uri(uriBuilder -> uriBuilder
                             .path("/services/{svcMgmtNum}")
                             .build(svcMgmtNum))
-                    .body(BodyInserters.fromValue(SvcUpdateRequestDto.createSuspendServiceDto()))
+                    .body(BodyInserters.fromValue(ServiceStatusChangeRequestDto.createSuspendServiceDto()))
                     .retrieve()
                     .bodyToMono(Void.class);
         }
@@ -87,7 +90,7 @@ public class ServiceService {
                     .uri(uriBuilder -> uriBuilder
                             .path("/services/{svcMgmtNum}")
                             .build(svcMgmtNum))
-                    .body(BodyInserters.fromValue(SvcUpdateRequestDto.createTerminateServiceDto()))
+                    .body(BodyInserters.fromValue(ServiceStatusChangeRequestDto.createTerminateServiceDto()))
                     .retrieve()
                     .bodyToMono(Void.class);
         }
@@ -100,9 +103,10 @@ public class ServiceService {
                     .uri(uriBuilder -> uriBuilder
                             .path("/services/{svcMgmtNum}")
                             .build(svcMgmtNum))
-                    .body(BodyInserters.fromValue(SvcUpdateRequestDto.createChangeBasicProdDto(feeProdId)))
+                    .body(BodyInserters.fromValue(SvcStatusChangeRequestDto.createChangeBasicProdDto(feeProdId)))
                     .retrieve()
                     .bodyToMono(Void.class);
         }
+         */
     }
 }

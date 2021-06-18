@@ -24,7 +24,7 @@ public class ProdController {
     }
 
     @PostMapping
-    public Mono<ProdResponseDto> createProduct(@RequestBody ProdCreateRequestDto dto) {
+    public ProdResponseDto createProduct(@RequestBody ProdCreateRequestDto dto) {
         return prodService.createProduct(dto);
     }
 

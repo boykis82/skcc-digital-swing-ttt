@@ -28,7 +28,7 @@ public class SvcRepositorySupport  {
                 )
                 .offset(offset)
                 .limit(limit)
-                .orderBy( svc.svcStCd.asc(), svc.svcScrbDt.asc() )
+                .orderBy( svc.svcStCd.asc(), svc.id.asc() )
                 .fetchResults();
 
         return result.getResults();

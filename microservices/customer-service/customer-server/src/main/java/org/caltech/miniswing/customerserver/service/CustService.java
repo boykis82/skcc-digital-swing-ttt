@@ -65,13 +65,10 @@ public class CustService {
     }
 
     @Transactional
-    public Mono<CustResponseDto> createCustomer(CustCreateRequestDto dto) {
+    public CustResponseDto createCustomer(CustCreateRequestDto dto) {
         Cust c = custCreateRequestMapper.dtoToEntity(dto);
         c.setCustRgstDt(LocalDate.now());
-        return asyncHelper.mono( () ->
-                Mono.fromCallable( () -> custRepository.save(c))
-                        .map(custResponseMapper::entityToDto)
-                        .log()
-        );
+        c = custRepository.save(c);
+        return custResponseMapper.entityToDto(c);
     }
 }

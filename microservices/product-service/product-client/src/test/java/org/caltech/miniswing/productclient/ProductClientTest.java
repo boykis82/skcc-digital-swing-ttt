@@ -92,6 +92,7 @@ public class ProductClientTest {
         assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/products/2?svcMgmtNum=1");
     }
 
+    /*
     @Test
     public void 상품모두해지() throws Exception {
         mockBackEnd.enqueue(new MockResponse());
@@ -105,4 +106,6 @@ public class ProductClientTest {
         assertThat(recordedRequest.getMethod()).isEqualTo("DELETE");
         assertThat(recordedRequest.getPath()).isEqualTo("/swing/api/v1/products?svcMgmtNum=1");
     }
+
+     */
 }

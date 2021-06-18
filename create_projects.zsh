@@ -127,6 +127,23 @@ spring init \
 --version=1.0.0-SNAPSHOT \
 util
 
+mkdir billing-service
+cd billing-service
+
+spring init \
+--boot-version=2.3.2.RELEASE \
+--build=gradle \
+--java-version=1.8 \
+--packaging=jar \
+--name=plm-client \
+--package-name=org.caltech.miniswing.billingclient \
+--groupId=org.caltech.miniswing.billingclient \
+--dependencies=actuator,webflux \
+--version=1.0.0-SNAPSHOT \
+billing-client
+
+cd ..
+
 mkdir spring-cloud
 cd spring-cloud
 spring init \

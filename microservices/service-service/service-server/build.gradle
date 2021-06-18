@@ -30,6 +30,7 @@ repositories {
 
 dependencies {
 	implementation project(':util')
+	implementation project(':microservices:billing-service:billing-client')
 	implementation project(':microservices:service-service:service-client')
 	implementation project(':microservices:plm-service:plm-client')
 	implementation project(':microservices:product-service:product-client')
@@ -43,13 +44,11 @@ dependencies {
 	testImplementation('io.projectreactor:reactor-test')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 
-	/*
-	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
-	implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
-	implementation('io.springfox:springfox-boot-starter:3.0.0')
-	testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
+	//implementation('io.springfox:springfox-boot-starter:3.0.0')
 
-	 */
+	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+	//implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+	testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
 
 	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 

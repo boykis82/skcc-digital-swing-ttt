@@ -30,7 +30,7 @@ public class CustController {
     }
 
     @PostMapping
-    public Mono<CustResponseDto> createCustomer(@RequestBody CustCreateRequestDto dto) {
+    public CustResponseDto createCustomer(@RequestBody CustCreateRequestDto dto) {
         return custService.createCustomer(dto);
     }
 }

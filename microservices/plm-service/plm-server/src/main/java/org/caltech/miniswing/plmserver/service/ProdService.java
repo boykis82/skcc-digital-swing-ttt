@@ -1,6 +1,5 @@
 package org.caltech.miniswing.plmserver.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.caltech.miniswing.exception.NotFoundDataException;
 import org.caltech.miniswing.plmclient.dto.ProdResponseDto;
@@ -9,16 +8,13 @@ import org.caltech.miniswing.plmserver.dto.ProdCreateRequestDto;
 import org.caltech.miniswing.plmserver.mapper.ProdCreateRequestMapper;
 import org.caltech.miniswing.plmserver.mapper.ProdResponseMapper;
 import org.caltech.miniswing.util.AsyncHelper;
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @Service
 @Slf4j
@@ -54,7 +50,6 @@ public class ProdService {
         return asyncHelper.flux( () ->
                 Flux.fromIterable(prodResponseMapper.entityListToDtoList(
                         prodRepository.findByProdNmContainingOrderByProdId(prodNm)))
-                        .log()
         );
     }
 
@@ -63,7 +58,6 @@ public class ProdService {
         return asyncHelper.flux( () ->
                 Flux.fromIterable(prodResponseMapper.entityListToDtoList(
                         prodRepository.findAll()))
-                        .log()
         );
     }
 
@@ -72,16 +66,15 @@ public class ProdService {
         return asyncHelper.flux( () ->
                 Flux.fromIterable(prodResponseMapper.entityListToDtoList(
                         prodRepository.findByProdIdInOrderByProdId(prodIds)))
-                        .log()
         );
     }
 
     @Transactional
-    public Mono<ProdResponseDto> createProduct(ProdCreateRequestDto dto) {
-        return asyncHelper.mono( () ->
-                Mono.fromCallable( () -> prodRepository.save(prodCreateRequestMapper.dtoToEntity(dto)))
-                        .map(prodResponseMapper::entityToDto)
-                        .log()
+    public ProdResponseDto createProduct(ProdCreateRequestDto dto) {
+        return prodResponseMapper.entityToDto(
+                prodRepository.save(
+                        prodCreateRequestMapper.dtoToEntity(dto)
+                )
         );
     }
 }

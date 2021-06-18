@@ -7,7 +7,7 @@ import org.caltech.miniswing.productclient.dto.ProdSubscribeRequestDto;
 import org.caltech.miniswing.productserver.domain.SvcProd;
 import org.caltech.miniswing.productserver.domain.SvcProdRepository;
 import org.caltech.miniswing.serviceclient.ServiceClient;
-import org.caltech.miniswing.serviceclient.dto.SvcResponseDto;
+import org.caltech.miniswing.serviceclient.dto.ServiceDto;
 import org.caltech.miniswing.serviceclient.dto.SvcStCd;
 import org.junit.After;
 import org.junit.Before;
@@ -67,30 +67,6 @@ public class ProdControllerTest {
         svcProdRepository.deleteAll();
     }
 
-    @Test
-    public void test_상품가입_해지된서비스()  {
-        //-- mock에서 해지된 서비스 리턴
-        given( serviceClient.getService(svcMgmtNum) )
-                .willReturn( Mono.just(
-                        SvcResponseDto.builder()
-                                .svcMgmtNum(svcMgmtNum)
-                                .svcStCd(SvcStCd.TG)
-                                .build()
-                ) );
-
-        ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
-                .svcMgmtNum(svcMgmtNum)
-                .prodId("NA00000005")
-                .svcProdCd(SvcProdCd.P3)
-                .build();
-
-        client.post()
-                .uri(urlPrefix)
-                .accept(APPLICATION_JSON)
-                .body(BodyInserters.fromValue(dto))
-                .exchange()
-                .expectStatus().is5xxServerError();     //-- global error handler가 안 먹는다.. 도무지 모르겠다.
-    }
 
     @Test
     public void test_상품가입_부가서비스() {
@@ -99,15 +75,18 @@ public class ProdControllerTest {
         //-- mock에서 살아있는 서비스 리턴
         given( serviceClient.getService(svcMgmtNum) )
                 .willReturn( Mono.just(
-                        SvcResponseDto.builder()
+                        ServiceDto.builder()
                                 .svcMgmtNum(svcMgmtNum)
                                 .svcStCd(SvcStCd.AC)
                                 .build()
                 ) );
 
-        //-- mock에서 빈 값 리턴
+
+        /* messaging 기반으로 변경
         given( serviceClient.changeBasicProduct(svcMgmtNum, prodId) )
                 .willReturn(Mono.empty().then());
+
+         */
 
         ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
                 .svcMgmtNum(svcMgmtNum)
@@ -132,14 +111,17 @@ public class ProdControllerTest {
 
         given( serviceClient.getService(svcMgmtNum) )
                 .willReturn( Mono.just(
-                        SvcResponseDto.builder()
+                        ServiceDto.builder()
                                 .svcMgmtNum(svcMgmtNum)
                                 .svcStCd(SvcStCd.AC)
                                 .build()
                 ) );
 
+        /* messaging 기반으로 변경
         given( serviceClient.changeBasicProduct(svcMgmtNum, prodId) )
                 .willReturn(Mono.empty().then());
+
+         */
 
         ProdSubscribeRequestDto dto = ProdSubscribeRequestDto.builder()
                 .svcMgmtNum(svcMgmtNum)
@@ -193,7 +175,7 @@ public class ProdControllerTest {
 
         given( serviceClient.getService(svcMgmtNum) )
                 .willReturn( Mono.just(
-                        SvcResponseDto.builder()
+                        ServiceDto.builder()
                                 .svcMgmtNum(svcMgmtNum)
                                 .svcStCd(SvcStCd.AC)
                                 .build()

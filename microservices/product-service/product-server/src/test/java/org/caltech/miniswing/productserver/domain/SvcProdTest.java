@@ -3,7 +3,6 @@ package org.caltech.miniswing.productserver.domain;
 import org.caltech.miniswing.exception.DataIntegrityViolationException;
 import org.caltech.miniswing.exception.InvalidInputException;
 import org.caltech.miniswing.plmclient.dto.SvcProdCd;
-import org.caltech.miniswing.productclient.dto.ProdSubscribeRequestDto;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +42,7 @@ public class SvcProdTest {
     @Test
     public void test_서비스상태에따른조회() {
         //-- 기본요금제, 부가요금제, 부가서비스 각각 1개씩 가입한 샘플
-        Svc svc = subscribeSampleSvc();
+        SvcProds svc = subscribeSampleSvc();
         assertThat(svcProdRepository.findAllSvcProds(svc.getSvcMgmtNum())).hasSize(3);
 
         List<SvcProd> activeSvcProds = svcProdRepository.findActiveSvcProds(svc.getSvcMgmtNum());
@@ -62,7 +61,7 @@ public class SvcProdTest {
 
     @Test
     public void test_상품해지() {
-        Svc svc = subscribeSampleSvc();
+        SvcProds svc = subscribeSampleSvc();
         LocalDateTime now = LocalDateTime.now();
 
         SvcProd termSvcProd = svcProdRepository.findActiveSvcProds(svc.getSvcMgmtNum()).stream()
@@ -77,7 +76,7 @@ public class SvcProdTest {
 
     @Test(expected = InvalidInputException.class)
     public void test_상품해지_기본요금제_예외발생() {
-        Svc svc = subscribeSampleSvc();
+        SvcProds svc = subscribeSampleSvc();
         LocalDateTime now = LocalDateTime.now();
 
         SvcProd termSvcProd = svcProdRepository.findActiveSvcProds(svc.getSvcMgmtNum()).stream()
@@ -91,7 +90,7 @@ public class SvcProdTest {
 
     @Test
     public void test_부가서비스추가() {
-        Svc svc = subscribeSampleSvc();
+        SvcProds svc = subscribeSampleSvc();
         LocalDateTime now = LocalDateTime.now();
 
         //-- 다른 부가서비스 가입
@@ -112,14 +111,14 @@ public class SvcProdTest {
 
     @Test(expected = InvalidInputException.class)
     public void test_중복상품가입_예외발생() {
-        Svc svc = subscribeSampleSvc();
+        SvcProds svc = subscribeSampleSvc();
         svc.subscribeProduct(prods_p3.get(0), SvcProdCd.P3);
         fail("여기 오면 안됨");
     }
 
     @Test
     public void test_기본요금제_존재하는상태에서_다른기본요금제_가입() {
-        Svc svc = subscribeSampleSvc();
+        SvcProds svc = subscribeSampleSvc();
 
         //-- 다른 기본요금제 가입
         svcProdRepository.saveAll(
@@ -150,7 +149,7 @@ public class SvcProdTest {
 
     @Test
     public void test_서비스개통시_상품가입() {
-        Svc svc = Svc.builder()
+        SvcProds svc = SvcProds.builder()
                 .svcMgmtNum(1)
                 .svcProds(svcProdRepository.findActiveSvcProds(1))
                 .build();
@@ -164,7 +163,7 @@ public class SvcProdTest {
     }
 
     //-- 서비스 개통 & 상품 3개 가입한 샘플 서비스
-    private Svc subscribeSampleSvc() {
+    private SvcProds subscribeSampleSvc() {
         long svcMgmtNum = 1L;
         LocalDateTime now = LocalDateTime.now();
         List<SvcProd> svcProds = Arrays.asList(
@@ -173,7 +172,7 @@ public class SvcProdTest {
                 SvcProd.createNewSvcProd(svcMgmtNum, prods_p3.get(0), SvcProdCd.P3, now)
         );
         svcProdRepository.saveAll(svcProds);
-        return Svc.builder()
+        return SvcProds.builder()
                 .svcMgmtNum(svcMgmtNum)
                 .svcProds(svcProds)
                 .build();

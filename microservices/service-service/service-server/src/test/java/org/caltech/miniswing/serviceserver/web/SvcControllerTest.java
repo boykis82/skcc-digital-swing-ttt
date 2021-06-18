@@ -4,13 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.caltech.miniswing.plmclient.PlmClient;
 import org.caltech.miniswing.plmclient.dto.ProdResponseDto;
 import org.caltech.miniswing.productclient.ProductClient;
-import org.caltech.miniswing.productclient.dto.ProdSubscribeRequestDto;
 import org.caltech.miniswing.serviceclient.dto.SvcCd;
 import org.caltech.miniswing.serviceclient.dto.SvcStCd;
-import org.caltech.miniswing.serviceclient.dto.SvcUpdateRequestDto;
+import org.caltech.miniswing.serviceclient.dto.ServiceStatusChangeRequestDto;
 import org.caltech.miniswing.serviceserver.domain.Svc;
 import org.caltech.miniswing.serviceserver.domain.SvcRepository;
-import org.caltech.miniswing.serviceserver.dto.SvcCreateRequestDto;
+import org.caltech.miniswing.serviceserver.dto.ServiceCreateRequestDto;
 import org.caltech.miniswing.serviceserver.service.SvcService;
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
@@ -34,7 +32,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -83,15 +80,12 @@ public class SvcControllerTest {
 
     @Test
     public void test_서비스생성() throws Exception {
-        SvcCreateRequestDto dto = SvcCreateRequestDto.builder()
+        ServiceCreateRequestDto dto = ServiceCreateRequestDto.builder()
                 .svcNum("01012345667")
                 .svcCd(SvcCd.C)
                 .custNum(custNum)
                 .feeProdId(prods.get(0))
                 .build();
-
-        given( productClient.subscribeProduct(any(ProdSubscribeRequestDto.class)) )
-                .willReturn(Mono.empty().then());
 
         client.post()
                 .uri(urlPrefix)
@@ -110,10 +104,12 @@ public class SvcControllerTest {
 
         long svcMgmtNum = svcRepository.findAll().get(0).getSvcMgmtNum();
 
+        mockPlmService(s);
+
         client.put()
-                .uri(urlPrefix + "/" + s.getSvcMgmtNum())
+                .uri(buildServiceStatusChangeUrl(s))
                     .accept(APPLICATION_JSON)
-                .body(BodyInserters.fromValue(SvcUpdateRequestDto.createSuspendServiceDto()))
+                .body(BodyInserters.fromValue(ServiceStatusChangeRequestDto.createSuspendServiceDto()))
                 .exchange()
                     .expectStatus().isOk()
         ;
@@ -127,13 +123,16 @@ public class SvcControllerTest {
         s.suspend(LocalDateTime.now().minusDays(3));
         svcRepository.save(s);
 
+        mockPlmService(s);
+
         client.put()
-                .uri(urlPrefix + "/" + s.getSvcMgmtNum())
-                .accept(APPLICATION_JSON)
-                .body(BodyInserters.fromValue(SvcUpdateRequestDto.createActivateServiceDto()))
+                .uri(buildServiceStatusChangeUrl(s))
+                    .accept(APPLICATION_JSON)
+                .body(BodyInserters.fromValue(ServiceStatusChangeRequestDto.createActivateServiceDto()))
                 .exchange()
-                .expectStatus().isOk()
+                    .expectStatus().isOk()
         ;
+
 
         assertThat(svcService.getService(s.getSvcMgmtNum()).block().getSvcStCd()).isEqualTo(SvcStCd.AC);
     }
@@ -142,13 +141,12 @@ public class SvcControllerTest {
     public void test_서비스해지() throws Exception {
         Svc s = subscribeSampleSvc();
 
-        given( productClient.terminateAllProducts(s.getSvcMgmtNum()) )
-                .willReturn(Mono.empty().then());
+        mockPlmService(s);
 
         client.put()
-                .uri(urlPrefix + "/" + s.getSvcMgmtNum())
+                .uri(buildServiceStatusChangeUrl(s))
                     .accept(APPLICATION_JSON)
-                .body(BodyInserters.fromValue(SvcUpdateRequestDto.createTerminateServiceDto()))
+                .body(BodyInserters.fromValue(ServiceStatusChangeRequestDto.createTerminateServiceDto()))
                 .exchange()
                     .expectStatus().isOk()
         ;
@@ -156,6 +154,7 @@ public class SvcControllerTest {
         assertThat(svcService.getService(s.getSvcMgmtNum()).block().getSvcStCd()).isEqualTo(SvcStCd.TG);
     }
 
+    /*
     @Test
     public void 기본요금제변경() throws Exception {
         Svc s = subscribeSampleSvc();
@@ -175,19 +174,18 @@ public class SvcControllerTest {
         assertThat(svcService.getService(s.getSvcMgmtNum()).block().getFeeProdId()).isEqualTo(afterProdId);
     }
 
+     */
+
     @Test
     public void test_서비스조회() throws Exception {
         Svc s = subscribeSampleSvc();
 
         String url = urlPrefix + "/" + s.getSvcMgmtNum();
 
-        given( plmClient.getProdNmByIds(Collections.singletonList(prods.get(0))) )
-                .willReturn( Mono.just(Collections.singletonList(
-                        ProdResponseDto.builder().prodId(prods.get(0)).prodNm("표준요금제").build()))
-                );
+        mockPlmService(s);
 
         client.get()
-                .uri(urlPrefix + "/" + s.getSvcMgmtNum())
+                .uri(url)
                     .accept(APPLICATION_JSON)
                 .exchange()
                     .expectStatus().isOk()
@@ -197,6 +195,34 @@ public class SvcControllerTest {
                     .jsonPath("$.svcNum").isEqualTo(s.getSvcNum())
                     .jsonPath("$.feeProdId").isEqualTo(s.getFeeProdId())
                     .jsonPath("$.feeProdNm").isEqualTo("표준요금제");
+    }
+
+    @Test
+    public void test_서비스조회_고객단위() throws Exception {
+        List<Svc> svcs = subscribeSampleSvcs();
+
+        String url = urlPrefix + "?custNum=1&offset=0&limit=10&includeTermSvc=true";
+
+        given( plmClient.getProdNmByIds(any()) )
+                .willReturn( Mono.just(Arrays.asList(
+                        ProdResponseDto.builder().prodId(prods.get(0)).prodNm("표준요금제").build(),
+                        ProdResponseDto.builder().prodId(prods.get(1)).prodNm("기본요금제").build()
+                )));
+
+        client.get()
+                .uri(url)
+                    .accept(APPLICATION_JSON)
+                .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(APPLICATION_JSON)
+                .expectBody()
+                    .jsonPath("$.length()").isEqualTo(3)
+                    .jsonPath("$[0].svcMgmtNum").isEqualTo(svcs.get(0).getSvcMgmtNum())
+                    .jsonPath("$[0].feeProdNm").isEqualTo("표준요금제")
+                    .jsonPath("$[1].svcMgmtNum").isEqualTo(svcs.get(1).getSvcMgmtNum())
+                    .jsonPath("$[1].feeProdNm").isEqualTo("기본요금제")
+                    .jsonPath("$[2].svcMgmtNum").isEqualTo(svcs.get(2).getSvcMgmtNum())
+                    .jsonPath("$[2].feeProdNm").isEqualTo("표준요금제");
     }
 
     private Svc subscribeSampleSvc() {
@@ -210,6 +236,48 @@ public class SvcControllerTest {
                 .build();
         s.subscribe(LocalDateTime.now());
         return svcRepository.save(s);
+    }
+
+    private List<Svc> subscribeSampleSvcs() {
+        return svcRepository.saveAll(
+                Arrays.asList(
+                        Svc.builder()
+                                .svcCd(SvcCd.C)
+                                .svcStCd(SvcStCd.AC)
+                                .svcNum("0101234567")
+                                .svcScrbDt(LocalDate.now())
+                                .feeProdId(prods.get(0))
+                                .custNum(custNum)
+                                .build(),
+                        Svc.builder()
+                                .svcCd(SvcCd.C)
+                                .svcStCd(SvcStCd.AC)
+                                .svcNum("0101234568")
+                                .svcScrbDt(LocalDate.now())
+                                .feeProdId(prods.get(1))
+                                .custNum(custNum)
+                                .build(),
+                        Svc.builder()
+                                .svcCd(SvcCd.C)
+                                .svcStCd(SvcStCd.AC)
+                                .svcNum("0101234569")
+                                .svcScrbDt(LocalDate.now())
+                                .feeProdId(prods.get(0))
+                                .custNum(custNum)
+                                .build()
+                )
+        );
+    }
+
+    private String buildServiceStatusChangeUrl(Svc s) {
+        return urlPrefix + "/" + s.getSvcMgmtNum() + "/status";
+    }
+
+    private void mockPlmService(Svc s) {
+        given( plmClient.getProdNmByIds(any()) )
+                .willReturn( Mono.just(Collections.singletonList(
+                        ProdResponseDto.builder().prodId(s.getFeeProdId()).prodNm("표준요금제").build()))
+                );
     }
 }
 
