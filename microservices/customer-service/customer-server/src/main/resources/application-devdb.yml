@@ -13,8 +13,8 @@ spring:
 
   datasource:
     initialization-mode: always
-    url: jdbc:mysql://localhost:13308/customer
-    username: user
-    password: pwd
+    url: jdbc:mysql://team1-poc-an2-db-mysql.cluster-ckfkoizozxni.ap-northeast-2.rds.amazonaws.com/customer
+    username: admin
+    password: admin!234
     driver-class-name: com.mysql.cj.jdbc.Driver
     #schema: classpath*:db/mysql/schema.sql
