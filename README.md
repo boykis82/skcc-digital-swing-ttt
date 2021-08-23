@@ -1,6 +1,12 @@
 # skcc-digital-swing-ttt
 skcc-digital-swing-ttt
 
+### DB Connection 정보 setting
+```
+legacy-customer-server, new-customer-server의 
+application-realdb.yml 에 db접속 정보 채움
+```
+
 ### java source build
 ```
 ./gradlew build
