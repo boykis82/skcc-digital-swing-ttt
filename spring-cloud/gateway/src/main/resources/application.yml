@@ -37,33 +37,12 @@ spring.cloud.gateway.routes:
     predicates:
       - Path=/eureka/**
 
-  - id: service
-    uri: lb://service
+  - id: legacy-customer
+    uri: lb://legacy-customer
     predicates:
-      - Path=/service/**
+      - Path=/legacy-customer/**
     filters:
-      - RewritePath=/service/(?<path>.*),/$\{path}
-
-  - id: plm
-    uri: lb://plm
-    predicates:
-      - Path=/plm/**
-    filters:
-      - RewritePath=/plm/(?<path>.*),/$\{path}
-
-  - id: product
-    uri: lb://product
-    predicates:
-      - Path=/product/**
-    filters:
-      - RewritePath=/product/(?<path>.*),/$\{path}
-
-  - id: customer
-    uri: lb://customer
-    predicates:
-      - Path=/customer/**
-    filters:
-      - RewritePath=/customer/(?<path>.*),/$\{path}
+      - RewritePath=/legacy-customer/(?<path>.*),/$\{path}
 
   - id: composite
     uri: lb://gateway

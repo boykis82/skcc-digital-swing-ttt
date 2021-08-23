@@ -1,14 +1,14 @@
 version: '3'
 
 services:
-  mysql-plm:
+  mysql-new-customer:
     image: mysql:5.7
     mem_limit: 350m
     ports:
       - "13306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=rootpwd
-      - MYSQL_DATABASE=plm
+      - MYSQL_DATABASE=customer-b
       - MYSQL_USER=user
       - MYSQL_PASSWORD=pwd
     healthcheck:
@@ -18,30 +18,9 @@ services:
       retries: 10
     volumes:
       - ./mysql-custom.cnf:/etc/mysql/conf.d/custom.cnf
-      - /Users/realimpact/Documents/swingdb/plm:/var/lib/mysql
+      - ./swingdb/newcustomer:/var/lib/mysql
 
-
-  mysql-product:
-    image: mysql:5.7
-    mem_limit: 350m
-    ports:
-      - "13307:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpwd
-      - MYSQL_DATABASE=product
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=pwd
-    healthcheck:
-      test: "/usr/bin/mysql --user=user --password=pwd --execute \"SHOW DATABASES;\""
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - ./mysql-custom.cnf:/etc/mysql/conf.d/custom.cnf
-      - /Users/realimpact/Documents/swingdb/product:/var/lib/mysql
-
-
-  mysql-customer:
+  mysql-legacy-customer:
     image: mysql:5.7
     mem_limit: 350m
     ports:
@@ -58,76 +37,27 @@ services:
       retries: 10
     volumes:
       - ./mysql-custom.cnf:/etc/mysql/conf.d/custom.cnf
-      - /Users/realimpact/Documents/swingdb/customer:/var/lib/mysql
+      - ./swingdb/legacycustomer:/var/lib/mysql
 
-
-  mysql-service:
-    image: mysql:5.7
-    mem_limit: 350m
-    ports:
-      - "13309:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpwd
-      - MYSQL_DATABASE=service
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=pwd
-    healthcheck:
-      test: "/usr/bin/mysql --user=user --password=pwd --execute \"SHOW DATABASES;\""
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - ./mysql-custom.cnf:/etc/mysql/conf.d/custom.cnf
-      - /Users/realimpact/Documents/swingdb/service:/var/lib/mysql
-
-
-  prod:
-    build: microservices/product-service/product-server
+  new-customer:
+    build: microservices/new-customer-server
     mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
-    depends_on:
-      mysql-product:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
+    #depends_on:
+    #  mysql-plm:
+    #    condition: service_healthy
 
-
-  plm:
-    build: microservices/plm-service/plm-server
+  legacy-customer:
+    build: microservices/legacy-customer-service/legacy-customer-server
     mem_limit: 350m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - TZ=Asia/Seoul
-    depends_on:
-      mysql-plm:
-        condition: service_healthy
-
-
-  customer:
-    build: microservices/customer-service/customer-server
-    mem_limit: 350m
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - TZ=Asia/Seoul
-    depends_on:
-      mysql-customer:
-        condition: service_healthy
-
-
-  service:
-    build: microservices/service-service/service-server
-    mem_limit: 350m
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - TZ=Asia/Seoul
-    depends_on:
-      mysql-service:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-
+    #depends_on:
+    #  mysql-customer:
+    #    condition: service_healthy
 
   gateway:
     environment:
@@ -137,20 +67,6 @@ services:
     ports:
       - "8080:8080"
 
-
   eureka:
     build: spring-cloud/eureka-server
     mem_limit: 350m
-
-
-  rabbitmq:
-    image: rabbitmq:3.7.8-management
-    mem_limit: 350m
-    ports:
-      - 5672:5672
-      - 15672:15672
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 20s
-      timeout: 5s
-      retries: 10

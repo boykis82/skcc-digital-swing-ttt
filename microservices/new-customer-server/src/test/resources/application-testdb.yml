@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    show_sql: true
+    format_sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL57Dialect
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem://localhost/~/customer2;MODE=MYSQL

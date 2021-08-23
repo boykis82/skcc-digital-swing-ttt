@@ -1,19 +1,15 @@
 package org.caltech.miniswing.gateway.web;
 
-import org.caltech.miniswing.customerclient.CustomerClient;
-import org.caltech.miniswing.customerclient.dto.CustResponseDto;
-import org.caltech.miniswing.gateway.dto.CompositeSvcResponseDto;
-import org.caltech.miniswing.productclient.ProductClient;
-import org.caltech.miniswing.productclient.dto.SvcProdResponseDto;
-import org.caltech.miniswing.serviceclient.ServiceClient;
-import org.caltech.miniswing.serviceclient.dto.ServiceDto;
+import org.skcc.team1.legacy.customerclient.CustomerClient;
+import org.skcc.team1.legacy.customerclient.dto.CustResponseDto;
+import org.caltech.miniswing.gateway.dto.CompositeCustomerResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple3;
+import reactor.util.function.Tuple2;
 
 import java.util.List;
 
@@ -22,32 +18,24 @@ import java.util.List;
 public class CompositeApi {
 
     @Autowired
-    private ProductClient productClient;
-
-    @Autowired
-    private ServiceClient serviceClient;
-
-    @Autowired
     private CustomerClient customerClient;
 
-    @GetMapping("/composite-service/{svcMgmtNum}")
-    public Mono<CompositeSvcResponseDto> getCompositeService(@PathVariable("svcMgmtNum") long svcMgmtNum) {
-        Mono<ServiceDto> svcResponseDtoMono = serviceClient.getService(svcMgmtNum);
+    @GetMapping("/composite-api/{custNum}")
+    public Mono<CompositeCustomerResponseDto> getCompositeCustomers(@PathVariable("custNum") long custNum) {
+        Mono<CustResponseDto> customerResponseDtoMono = customerClient.getCustomer(custNum);
 
-        Mono<List<SvcProdResponseDto>> svcProdResponseDtosMono = productClient.getServiceProducts(svcMgmtNum, false);
-
-        Mono<CustResponseDto> custResponseDtoMono = svcResponseDtoMono.zipWhen(
-                s -> customerClient.getCustomer(s.getCustNum()),
-                (s, c) -> c
+        Mono<List<CustResponseDto>> sameNameAndBirthdayCustomersResponseDtosMono = customerResponseDtoMono.zipWhen(
+                c -> customerClient.getCustomers(c.getCustNm(), c.getBirthDt()),
+                (c, c2) -> c2
         );
 
-        Mono<Tuple3<ServiceDto, CustResponseDto, List<SvcProdResponseDto>>> combined =
-                Mono.zip(svcResponseDtoMono, custResponseDtoMono, svcProdResponseDtosMono);
+        Mono<Tuple2<CustResponseDto, List<CustResponseDto>>> combined =
+                Mono.zip(customerResponseDtoMono, sameNameAndBirthdayCustomersResponseDtosMono);
 
-        return combined.map(this::createCompositeSvcResponseDto);
+        return combined.map(this::createCompositeCustomerResponseDto);
     }
 
-    private CompositeSvcResponseDto createCompositeSvcResponseDto(Tuple3<ServiceDto, CustResponseDto, List<SvcProdResponseDto>> tuple) {
-        return new CompositeSvcResponseDto(tuple.getT1(), tuple.getT2(), tuple.getT3());
+    private CompositeCustomerResponseDto createCompositeCustomerResponseDto(Tuple2<CustResponseDto, List<CustResponseDto>> tuple) {
+        return new CompositeCustomerResponseDto(tuple.getT1(), tuple.getT2());
     }
 }

@@ -32,3 +32,5 @@ java -jar microservices/product-service/product-server/build/libs/*.jar &
 java -jar microservices/service-service/service-server/build/libs/*.jar &
 java -jar spring-cloud/gateway/build/libs/*.jar &
 java -jar spring-cloud/eureka-server/build/libs/*.jar &
+
+docker compose up new-customer legacy-customer gateway eureka -d
