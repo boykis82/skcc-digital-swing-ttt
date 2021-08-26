@@ -41,8 +41,8 @@ aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name queue
 
 
 ## git history clear
-git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch /microservices/new-customer-server/src/main/resources/application-aws.yml' --prune-empty -- --all
-git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch /microservices/new-customer-server/src/main/resources/application-real.yml' --prune-empty -- --all
-git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch /microservices/legacy-customer-service/legacy-customer-server/src/main/resources/application-aws.yml' --prune-empty -- --all
+git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch ./microservices/new-customer-server/src/main/resources/application-aws.yml' --prune-empty -- --all
+git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch ./microservices/new-customer-server/src/main/resources/application-realdb.yml' --prune-empty -- --all
+git filter-branch -f --index-filter 'git rm --cached --ignore-unmatch ./microservices/legacy-customer-service/legacy-customer-server/src/main/resources/application-realdb.yml' --prune-empty -- --all
 
 git push origin master --force
