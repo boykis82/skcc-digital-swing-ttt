@@ -34,3 +34,7 @@ java -jar spring-cloud/gateway/build/libs/*.jar &
 java -jar spring-cloud/eureka-server/build/libs/*.jar &
 
 docker compose up new-customer legacy-customer gateway eureka -d
+
+
+## localstack
+aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name queue

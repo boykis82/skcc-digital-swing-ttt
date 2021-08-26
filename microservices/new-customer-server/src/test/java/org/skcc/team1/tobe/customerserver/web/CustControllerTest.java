@@ -50,8 +50,10 @@ public class CustControllerTest {
     @Test
     public void test_고객생성() throws Exception {
         CustCreateRequestDto dto = CustCreateRequestDto.builder()
+                .custNum(1)
                 .custNm("강인수")
                 .birthDt(LocalDate.of(1982,1,1))
+                .custRgstDt(LocalDate.now())
                 .custTypCd(CustTypCd.C01)
                 .build();
 
@@ -68,6 +70,7 @@ public class CustControllerTest {
     @Test
     public void test_고객조회_고객번호() throws Exception {
         Cust c = custRepository.save(Cust.builder()
+                .custNum(1)
                 .custNm("강인수")
                 .custRgstDt(LocalDate.of(2021,4,28))
                 .custTypCd(CustTypCd.C01)
@@ -92,6 +95,7 @@ public class CustControllerTest {
     @Test
     public void test_고객조회_이름과생일() throws Exception {
         custRepository.save(Cust.builder()
+                .custNum(1)
                 .custNm("강인수")
                 .custRgstDt(LocalDate.of(2021,4,28))
                 .custTypCd(CustTypCd.C01)
@@ -119,18 +123,21 @@ public class CustControllerTest {
     public void test_고객조회_이름과생일_여러명() throws Exception {
         custRepository.saveAll(Arrays.asList(
                 Cust.builder()
+                        .custNum(1)
                         .custNm("강인수")
                         .custRgstDt(LocalDate.of(2021,4,28))
                         .custTypCd(CustTypCd.C01)
                         .birthDt(LocalDate.of(1982,1,1))
                         .build(),
                 Cust.builder()
+                        .custNum(2)
                         .custNm("강인수")
                         .custRgstDt(LocalDate.of(2018,4,28))
                         .custTypCd(CustTypCd.C01)
                         .birthDt(LocalDate.of(1983,1,1))
                         .build(),
                 Cust.builder()
+                        .custNum(3)
                         .custNm("강인수")
                         .custRgstDt(LocalDate.of(2019,4,28))
                         .custTypCd(CustTypCd.C01)
@@ -151,11 +158,9 @@ public class CustControllerTest {
                 .expectBody()
                     .jsonPath("$[0].custNm").isEqualTo("강인수")
                     .jsonPath("$[0].birthDt").isEqualTo("1982-01-01")
-                    .jsonPath("$[0].custRgstDt").isEqualTo("2021-04-28")
                     .jsonPath("$[0].custTypCd.key").isEqualTo(CustTypCd.C01.getKey())
                     .jsonPath("$[1].custNm").isEqualTo("강인수")
                     .jsonPath("$[1].birthDt").isEqualTo("1982-01-01")
-                    .jsonPath("$[1].custRgstDt").isEqualTo("2019-04-28")
                     .jsonPath("$[1].custTypCd.key").isEqualTo(CustTypCd.C01.getKey())
         ;
     }

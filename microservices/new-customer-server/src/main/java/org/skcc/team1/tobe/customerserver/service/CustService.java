@@ -58,10 +58,9 @@ public class CustService {
     }
 
     @Transactional
-    public CustResponseDto createCustomer(CustCreateRequestDto dto) {
-        Cust c = custCreateRequestMapper.dtoToEntity(dto);
-        c.setCustRgstDt(LocalDate.now());
-        c = custRepository.save(c);
-        return custResponseMapper.entityToDto(c);
+    public CustResponseDto createCustomer(CustCreateRequestDto custCreateRequestDto) {
+        Cust newCustomer = custCreateRequestMapper.dtoToEntity(custCreateRequestDto);
+        newCustomer = custRepository.save(newCustomer);
+        return custResponseMapper.entityToDto(newCustomer);
     }
 }

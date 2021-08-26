@@ -9,6 +9,8 @@ import org.skcc.team1.legacy.customerserver.mapper.CustCreateRequestMapper;
 import org.skcc.team1.legacy.customerserver.mapper.CustResponseMapper;
 import org.caltech.miniswing.exception.NotFoundDataException;
 import org.caltech.miniswing.util.AsyncHelper;
+import org.skcc.team1.legacy.customerserver.messaging.CustomerMessagePublisher;
+import org.skcc.team1.legacy.customerserver.messaging.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ import static reactor.core.publisher.Mono.error;
 public class CustService {
     private final CustRepository custRepository;
 
+    private final CustomerMessagePublisher customerMessagePublisher;
+
     private final CustResponseMapper custResponseMapper;
     private final CustCreateRequestMapper custCreateRequestMapper;
 
@@ -32,11 +36,13 @@ public class CustService {
     @Autowired
     public CustService(AsyncHelper asyncHelper,
                        CustRepository custRepository,
+                       CustomerMessagePublisher customerMessagePublisher,
                        CustResponseMapper custResponseMapper,
                        CustCreateRequestMapper custCreateRequestMapper) {
-        this.asyncHelper             = asyncHelper;
-        this.custRepository          = custRepository;
-        this.custResponseMapper      = custResponseMapper;
+        this.asyncHelper = asyncHelper;
+        this.custRepository = custRepository;
+        this.customerMessagePublisher = customerMessagePublisher;
+        this.custResponseMapper = custResponseMapper;
         this.custCreateRequestMapper = custCreateRequestMapper;
     }
 
@@ -60,10 +66,15 @@ public class CustService {
     }
 
     @Transactional
-    public CustResponseDto createCustomer(CustCreateRequestDto dto) {
-        Cust c = custCreateRequestMapper.dtoToEntity(dto);
-        c.setCustRgstDt(LocalDate.now());
-        c = custRepository.save(c);
-        return custResponseMapper.entityToDto(c);
+    public CustResponseDto createCustomer(CustCreateRequestDto custCreateRequestDto) {
+        Cust newCust = custCreateRequestMapper.dtoToEntity(custCreateRequestDto);
+        newCust.setCustRgstDt(LocalDate.now());
+        newCust = custRepository.save(newCust);
+
+        CustResponseDto custResponseDto = custResponseMapper.entityToDto(newCust);
+
+        customerMessagePublisher.sendCustomerCreatedEvent(custResponseDto);
+
+        return custResponseDto;
     }
 }

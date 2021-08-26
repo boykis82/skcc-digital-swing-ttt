@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 @Getter
 public class DomainEventEnvelope<T> {
-
     private T data;
+    private String messageType;
     private LocalDateTime eventCreatedAt;
 
     public DomainEventEnvelope() {
@@ -15,8 +15,9 @@ public class DomainEventEnvelope<T> {
         this.eventCreatedAt = LocalDateTime.now();
     }
 
-    public DomainEventEnvelope(T data) {
+    public DomainEventEnvelope(T data, String messageType) {
         this.data = data;
+        this.messageType = messageType;
         this.eventCreatedAt = LocalDateTime.now();
     }
 }

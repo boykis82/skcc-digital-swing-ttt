@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Setter
 @ToString
 public class CustCreateRequestDto {
+    private long custNum;
+
     private String custNm;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -17,10 +19,15 @@ public class CustCreateRequestDto {
 
     private CustTypCd custTypCd;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate custRgstDt;
+
     @Builder
-    public CustCreateRequestDto(String custNm, LocalDate birthDt, CustTypCd custTypCd) {
+    public CustCreateRequestDto(long custNum, String custNm, LocalDate birthDt, CustTypCd custTypCd, LocalDate custRgstDt) {
+        this.custNum = custNum;
         this.custNm = custNm;
         this.birthDt = birthDt;
         this.custTypCd = custTypCd;
+        this.custRgstDt = custRgstDt;
     }
 }
