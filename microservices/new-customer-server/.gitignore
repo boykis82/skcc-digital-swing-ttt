@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 !**/src/**/resources/**/build/
-./src/main/resources/application-realdb.yml
+application-realdb.yml
 
 ### Eclipse ###
 .metadata
