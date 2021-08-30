@@ -1,0 +1,26 @@
+{{>layout/header}}
+
+<h1>고객등록</h1>
+
+<div class="col-md-12">
+    <div class="col-md-4">
+        <form>
+            <div class="form-group">
+                <label for="custNm">고객명</label>
+                <input type="text" class="form-control" id="custNm" value="강인수">
+            </div>
+            <div class="form-group">
+                <label for="birthDt">생년월일</label>
+                <input type="text" class="form-control" id="birthDt" value="1982-01-01">
+            </div>
+            <div class="form-group">
+                <label for="custTypCd">고객유형</label>
+                <input type="text" class="form-control" id="custTypCd" value="C01" disabled>
+            </div>
+        </form>
+        <a href="/" role="button" class="btn btn-secondary">취소</a>
+        <button type="button" class="btn btn-primary" id="btn-save">등록</button>
+    </div>
+</div>
+
+{{>layout/footer}}

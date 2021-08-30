@@ -23,9 +23,12 @@ public class CustController {
     }
 
     @GetMapping
-    public Flux<CustResponseDto> getCustomers(@RequestParam("custNm") String custNm,
-                                              @RequestParam("birthDt") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birthDt)  {
-        return custService.getCustomers(custNm, birthDt);
+    public Flux<CustResponseDto> getCustomers(@RequestParam(value = "custNm", required = false) String custNm,
+                                              @RequestParam(value = "birthDt", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birthDt)  {
+        if (custNm.length() == 0)
+            return custService.getAllCustomers();
+        else
+            return custService.getCustomers(custNm, birthDt);
     }
 
     @PostMapping

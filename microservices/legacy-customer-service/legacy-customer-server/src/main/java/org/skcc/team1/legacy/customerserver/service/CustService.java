@@ -52,7 +52,6 @@ public class CustService {
                 Mono.fromCallable( () -> custRepository.findById(custNum))
                         .map(oc -> oc.orElseThrow(() -> new NotFoundDataException("고객이 없습니다.! cust_num = " + custNum)))
                         .map(custResponseMapper::entityToDto)
-                        .log()
         );
     }
 
@@ -61,7 +60,6 @@ public class CustService {
         return asyncHelper.flux( () ->
                 Flux.fromIterable(custResponseMapper.entityListToDtoList(
                         custRepository.findByCustNmAndBirthDtOrderByCustRgstDtDesc(custNm, birthDt)))
-                        .log()
         );
     }
 
@@ -76,5 +74,13 @@ public class CustService {
         customerMessagePublisher.sendCustomerCreatedEvent(custResponseDto);
 
         return custResponseDto;
+    }
+
+    @Transactional(readOnly = true)
+    public Flux<CustResponseDto> getAllCustomers() {
+        return asyncHelper.flux( () ->
+                Flux.fromIterable(custResponseMapper.entityListToDtoList(
+                        custRepository.findAllDesc()))
+        );
     }
 }
