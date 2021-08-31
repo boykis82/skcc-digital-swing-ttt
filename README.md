@@ -8,9 +8,14 @@ application-realdb.yml 에 db접속 정보 채움
 ```
 
 ### java source build
+#### (intellij에서 열 때는 루트 프로젝트를 열지 말고 개별 폴더 별로 열어야 함)
 ```
+# linux or mac
 chmod 764 build_all.bash
 ./build_all.bash
+
+# windows
+build_all.bat
 ```
 
 ### docker image build
