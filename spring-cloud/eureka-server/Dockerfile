@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk:11.0.7
+FROM openjdk:11-jre-slim-buster
 
 EXPOSE 8080
 
