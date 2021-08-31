@@ -1,1 +1,5 @@
 rootProject.name = 'new-customer-server'
+
+include ':util'
+
+project(':util').projectDir = file("../../util")

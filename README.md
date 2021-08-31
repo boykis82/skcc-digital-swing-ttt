@@ -9,7 +9,8 @@ application-realdb.yml 에 db접속 정보 채움
 
 ### java source build
 ```
-./gradlew build
+chmod 764 build_all.bash
+./build_all.bash
 ```
 
 ### docker image build

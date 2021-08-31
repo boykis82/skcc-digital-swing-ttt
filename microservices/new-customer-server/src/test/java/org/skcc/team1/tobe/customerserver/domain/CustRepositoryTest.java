@@ -30,6 +30,7 @@ public class CustRepositoryTest {
     @Test
     public void test_저장_그냥jpatest용() {
         Cust c = Cust.builder()
+                .custNum(1)
                 .custNm("강인수")
                 .custTypCd(CustTypCd.C01)
                 .custRgstDt(LocalDate.now())

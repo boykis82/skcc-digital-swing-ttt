@@ -1,5 +1,5 @@
 create table cust (
-   cust_num bigint not null auto_increment,
+    cust_num bigint not null,
     created_by varchar(255),
     created_date datetime(6),
     last_modified_by varchar(255),

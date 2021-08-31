@@ -16,10 +16,9 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Table(name = "cust")
-public class Cust  extends BaseEntity {
+public class Cust extends BaseEntity {
     @Id
     @Column(name = "cust_num")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(length = 80, nullable = false)
@@ -36,11 +35,12 @@ public class Cust  extends BaseEntity {
     private CustTypCd custTypCd;
 
     @Builder
-    public Cust(String custNm, LocalDate custRgstDt, LocalDate birthDt, CustTypCd custTypCd) {
-        this.custNm     = custNm;
+    public Cust(long custNum, String custNm, LocalDate custRgstDt, LocalDate birthDt, CustTypCd custTypCd) {
+        this.id = custNum;
+        this.custNm = custNm;
         this.custRgstDt = custRgstDt;
-        this.birthDt    = birthDt;
-        this.custTypCd  = custTypCd;
+        this.birthDt = birthDt;
+        this.custTypCd = custTypCd;
     }
 
     public long getCustNum() {

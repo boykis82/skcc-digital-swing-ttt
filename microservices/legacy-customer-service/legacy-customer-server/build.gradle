@@ -30,7 +30,7 @@ repositories {
 
 dependencies {
 	implementation project(':util')
-	implementation project(':microservices:legacy-customer-service:legacy-customer-client')
+	implementation project(':legacy-customer-client')
 
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
@@ -69,10 +69,20 @@ dependencies {
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
+	// AWS
+	//implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging'
+
+	// localstack
+	implementation("io.awspring.cloud:spring-cloud-starter-aws-messaging")
+
 }
 
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+
+	imports {
+		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.1"
 	}
 }

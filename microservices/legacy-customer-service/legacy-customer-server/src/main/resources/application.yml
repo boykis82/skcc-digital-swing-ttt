@@ -1,9 +1,12 @@
-spring.profiles.include: realdb
+spring.profiles.include: realdb, aws
 
 server.port: 7001
 server.error.include-message: always
 
 spring.application.name: legacy-customer
+
+localstack:
+  host: localhost
 
 eureka:
   client:

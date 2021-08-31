@@ -2,6 +2,26 @@ spring.profiles.include: testdb
 
 server.error.include-message: always
 
+localstack:
+  host: localhost
+
+cloud:
+  aws:
+    credentials:
+      accessKey: foo
+      secretKey: bar
+
+    sqs:
+      queue:
+        url: http://localhost:4566/000000000000/queue
+        timeout: 5000
+
+    region:
+      static: ap-northeast-2
+
+    stack:
+      auto: false
+
 logging:
   level:
     root: INFO
