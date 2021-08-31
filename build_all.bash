@@ -26,6 +26,8 @@ chmod 764 gradlew
 ./gradlew build
 cd ..
 
+cd ..
+
 cd spring-cloud
 
 cd gateway
