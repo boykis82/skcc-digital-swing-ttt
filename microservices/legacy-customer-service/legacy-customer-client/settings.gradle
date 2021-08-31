@@ -1,1 +1,5 @@
 rootProject.name = 'legacy-customer-client'
+
+include ':util'
+
+project(':util').projectDir = file("../../../util")

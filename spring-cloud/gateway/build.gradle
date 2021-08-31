@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
 	implementation project(':util')
-	implementation project(':microservices:legacy-customer-service:legacy-customer-client')
+	implementation project(':legacy-customer-client')
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
