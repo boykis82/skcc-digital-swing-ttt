@@ -41,7 +41,7 @@ chmod 764 gradlew
 cd ..
 
 echo "6. build eureka..."
-cd eureka
+cd eureka-server
 chmod 764 gradlew
 ./gradlew build
 cd ..
