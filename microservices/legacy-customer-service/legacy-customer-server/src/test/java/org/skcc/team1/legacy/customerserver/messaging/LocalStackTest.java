@@ -1,6 +1,5 @@
 package org.skcc.team1.legacy.customerserver.messaging;
 
-import com.netflix.discovery.converters.Auto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,12 +14,6 @@ import java.time.LocalDate;
 
 import static org.skcc.team1.legacy.customerclient.dto.CustTypCd.C01;
 
-/*
-@Slf4j
-@RunWith(SpringRunner.class)
-@SpringBootTest(
-        properties = {"eureka.client.enabled=false"}
-)*/
 @Ignore
 public class LocalStackTest {
 

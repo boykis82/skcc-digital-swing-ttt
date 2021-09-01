@@ -41,7 +41,6 @@ dependencies {
 	testImplementation('io.projectreactor:reactor-test')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 
-	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 
 	// java.lang.NoClassDefFoundError: javax/annotation/Generated 해소
 	implementation("javax.annotation:javax.annotation-api:1.3.2")

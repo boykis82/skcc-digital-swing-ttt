@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.skcc.team1.legacy.customerclient.CustomerClient;
 import org.skcc.team1.legacy.customerclient.CustomerService;
 import org.caltech.miniswing.util.http.FilteredWebClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

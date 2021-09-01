@@ -23,8 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"eureka.client.enabled=false"}
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 public class CustControllerTest {
     @LocalServerPort

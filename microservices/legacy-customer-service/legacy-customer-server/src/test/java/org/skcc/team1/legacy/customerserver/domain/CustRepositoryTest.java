@@ -14,9 +14,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-        properties = {"eureka.client.enabled=false"}
-)
+@SpringBootTest
 public class CustRepositoryTest {
     @Autowired
     CustRepository custRepository;

@@ -2,6 +2,7 @@ package org.skcc.team1.tobe.customerserver.domain;
 
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -15,9 +16,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-        properties = {"eureka.client.enabled=false"}
-)
+@SpringBootTest
 public class CustRepositoryTest {
     @Autowired
     CustRepository custRepository;
@@ -40,7 +39,7 @@ public class CustRepositoryTest {
         assertThat(savedCust.getCustNum()).isNotEqualTo(0);
     }
 
-    @Test
+    @Ignore
     public void test_이름과생일로고객가져오기() {
         custRepository.saveAll( TestDataFactory.createManyCusts() );
         assertThat(custRepository.findByCustNmAndBirthDtOrderByCustRgstDtDesc("강인수", LocalDate.of(1982,1,1))).hasSize(1);

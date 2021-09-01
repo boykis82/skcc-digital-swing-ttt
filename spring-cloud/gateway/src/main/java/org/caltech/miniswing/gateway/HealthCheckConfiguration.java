@@ -37,7 +37,6 @@ public class HealthCheckConfiguration {
         ReactiveHealthIndicatorRegistry registry = new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
 
         registry.register("legacy-customer", () -> getHealth("http://legacy-customer"));
-        registry.register("new-customer", () -> getHealth("http://new-customer"));
 
         return new CompositeReactiveHealthIndicator(healthAggregator, registry);
     }

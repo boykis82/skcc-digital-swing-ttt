@@ -1,43 +1,6 @@
 version: '3'
 
 services:
-  mysql-new-customer:
-    image: mysql:5.7
-    mem_limit: 350m
-    ports:
-      - "13306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpwd
-      - MYSQL_DATABASE=customer-b
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=pwd
-    healthcheck:
-      test: "/usr/bin/mysql --user=user --password=pwd --execute \"SHOW DATABASES;\""
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - ./mysql-custom.cnf:/etc/mysql/conf.d/custom.cnf
-      - ./swingdb/newcustomer:/var/lib/mysql
-
-  mysql-legacy-customer:
-    image: mysql:5.7
-    mem_limit: 350m
-    ports:
-      - "13308:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpwd
-      - MYSQL_DATABASE=customer
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=pwd
-    healthcheck:
-      test: "/usr/bin/mysql --user=user --password=pwd --execute \"SHOW DATABASES;\""
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - ./mysql-custom.cnf:/etc/mysql/conf.d/custom.cnf
-      - ./swingdb/legacycustomer:/var/lib/mysql
 
   new-customer:
     build: microservices/new-customer-server
@@ -66,7 +29,3 @@ services:
     mem_limit: 350m
     ports:
       - "8080:8080"
-
-  eureka:
-    build: spring-cloud/eureka-server
-    mem_limit: 350m

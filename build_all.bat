@@ -35,9 +35,4 @@ cd gateway
 CALL ./gradlew build
 cd ..
 
-echo 6. build eureka...
-cd eureka-server
-CALL ./gradlew build
-cd ..
-
 cd ..
