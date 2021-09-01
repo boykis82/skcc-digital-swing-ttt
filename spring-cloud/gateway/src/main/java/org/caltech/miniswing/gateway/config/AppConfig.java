@@ -20,15 +20,12 @@ public class AppConfig {
         return WebClient.builder();
     }
 
-    @Autowired
-    private WebClient.Builder webClientBuilder;
-
     private WebClient custWebClient;
 
     @Bean
     public WebClient custWebClient() {
         if (custWebClient == null) {
-            custWebClient = FilteredWebClient.create(webClientBuilder, "http://legacy-customer/swing/api/v1");
+            custWebClient = FilteredWebClient.create(loadBalancedWebClientBuilder(), "http://legacy-customer/swing/api/v1");
         }
         return custWebClient;
     }
