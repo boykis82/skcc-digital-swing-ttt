@@ -25,7 +25,7 @@ docker compose build
 
 ### docker container run
 ```
-docker compose up new-customer legacy-customer gateway eureka -d
+docker compose up new-customer legacy-customer gateway -d
 ```
 
 ### 고객 정보 등록
