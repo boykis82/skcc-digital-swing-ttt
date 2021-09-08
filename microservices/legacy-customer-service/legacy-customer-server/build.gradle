@@ -33,7 +33,7 @@ dependencies {
 	implementation project(':legacy-customer-client')
 
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
-	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+//	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 	// tomcat 뜬다
 	//implementation("org.springframework.boot:spring-boot-starter-web")
 	// netty 뜬다
@@ -56,7 +56,7 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	annotationProcessor("org.projectlombok:lombok")
 
-	// QueryDSL
+//	// QueryDSL
 	implementation ("com.querydsl:querydsl-jpa:${queryDslVersion}")
 	annotationProcessor ("com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
 	testImplementation ("com.querydsl:querydsl-jpa:${queryDslVersion}")
@@ -70,6 +70,9 @@ dependencies {
 
 	// AWS
 	//implementation 'org.springframework.cloud:spring-cloud-starter-aws-messaging'
+
+	// JSON
+	compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
 
 	// localstack
 	implementation("io.awspring.cloud:spring-cloud-starter-aws-messaging")

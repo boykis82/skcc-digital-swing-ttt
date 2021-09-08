@@ -10,12 +10,14 @@ localstack:
 
 logging:
   level:
-    root: INFO
-    org.caltech.miniswing: DEBUG
+#    org.
+#    org.caltech.miniswing: DEBUG
     com:
       querydsl:
         sql: DEBUG
     org:
+#      springframework: INFO
+#      springframework.web: DEBUG
       hibernate:
         type:
           descriptor:

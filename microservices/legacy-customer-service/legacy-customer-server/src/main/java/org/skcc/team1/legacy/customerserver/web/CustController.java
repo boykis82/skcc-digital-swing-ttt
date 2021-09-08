@@ -1,10 +1,14 @@
 package org.skcc.team1.legacy.customerserver.web;
 
+import lombok.RequiredArgsConstructor;
 import org.skcc.team1.legacy.customerserver.dto.CustCreateRequestDto;
 import org.skcc.team1.legacy.customerclient.dto.CustResponseDto;
+import org.skcc.team1.legacy.customerserver.exception.TestException;
 import org.skcc.team1.legacy.customerserver.service.CustService;
+import org.skcc.team1.legacy.customerserver.service.TestExceptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,13 +17,22 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/swing/api/v1/customers")
+@RequiredArgsConstructor
 public class CustController {
-    @Autowired
-    private CustService custService;
+
+
+    private final CustService custService;
+    private final TestExceptionService testExceptionService;
 
     @GetMapping("/{custNum}")
     public Mono<CustResponseDto> getCustomer(@PathVariable("custNum") long custNum) {
         return custService.getCustomer(custNum);
+    }
+
+    @GetMapping("/exception")
+    public void exceptionHandler(@RequestParam("custNum") String custNum){
+
+        testExceptionService.testExceptionTestFunction(custNum);
     }
 
     @GetMapping

@@ -1,6 +1,7 @@
 package org.skcc.team1.legacy.customerserver.config;
 
 
+//import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.skcc.team1.legacy.customerclient.dto.CustTypCd;
 import org.caltech.miniswing.util.AsyncHelper;
