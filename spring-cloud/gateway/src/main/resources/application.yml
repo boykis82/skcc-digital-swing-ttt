@@ -15,7 +15,7 @@ spring.cloud.gateway.routes:
       - RewritePath=/legacy-customer/(?<path>.*),/$\{path}
 
   - id: composite
-    uri: http://gateway
+    uri: http://frontend
     predicates:
       - Path=/composite/**
     filters:
