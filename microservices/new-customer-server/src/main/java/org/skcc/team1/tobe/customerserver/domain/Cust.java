@@ -1,9 +1,6 @@
 package org.skcc.team1.tobe.customerserver.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.caltech.miniswing.domain.BaseEntity;
 import org.skcc.team1.tobe.customerserver.dto.CustTypCd;
 
@@ -16,9 +13,11 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Table(name = "cust")
+@ToString
 public class Cust extends BaseEntity {
+
     @Id
-    @Column(name = "cust_num")
+    @Column(name = "custNum")
     private long id;
 
     @Column(length = 80, nullable = false)

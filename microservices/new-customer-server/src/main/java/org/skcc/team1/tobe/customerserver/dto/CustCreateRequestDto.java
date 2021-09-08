@@ -1,6 +1,7 @@
 package org.skcc.team1.tobe.customerserver.dto;
 
 import lombok.*;
+import org.skcc.team1.tobe.customerserver.domain.Cust;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -30,4 +31,14 @@ public class CustCreateRequestDto {
         this.custTypCd = custTypCd;
         this.custRgstDt = custRgstDt;
     }
+
+    public Cust toEntity() {
+        return Cust.builder()
+                .custNm(custNm)
+                .custNum(custNum)
+                .custRgstDt(custRgstDt)
+                .custTypCd(custTypCd)
+                .build();
+    }
+
 }

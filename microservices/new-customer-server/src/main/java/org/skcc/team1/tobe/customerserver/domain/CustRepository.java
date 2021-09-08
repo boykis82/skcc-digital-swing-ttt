@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface CustRepository extends JpaRepository<Cust, Long> {
     List<Cust> findByCustNmAndBirthDtOrderByCustRgstDtDesc(String custNm, LocalDate birthDt);
+
+    List<Cust> findByCustNm(String custNm);
+
 }
