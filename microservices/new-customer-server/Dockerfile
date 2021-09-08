@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-slim-buster
+FROM adoptopenjdk/openjdk11
 
 EXPOSE 8080
 
