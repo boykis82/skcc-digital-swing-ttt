@@ -7,6 +7,13 @@ ribbon.NFLoadBalancerPingInterval: 5
 
 spring.cloud.gateway.routes:
 
+  - id: legacy-customer-error
+    uri: http://legacy-customer
+    predicates:
+      - Path=/customer-error
+    filters:
+      - RewritePath=/customer-error, /swing/api/v1/customers/exception
+
   - id: legacy-customer
     uri: http://legacy-customer
     predicates:
@@ -20,7 +27,6 @@ spring.cloud.gateway.routes:
       - Path=/composite/**
     filters:
       - RewritePath=/composite/(?<path>.*),/$\{path}
-
 
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
