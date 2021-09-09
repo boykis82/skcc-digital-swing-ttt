@@ -60,13 +60,8 @@ public class CustService {
     @Transactional
     public CustResponseDto createCustomer(CustCreateRequestDto custCreateRequestDto) {
 
-        System.out.println(custCreateRequestDto.toString());
         Cust newCustomer = custCreateRequestDto.toEntity();
-        System.out.println(newCustomer.toString());
-
         newCustomer = custRepository.save(newCustomer);
-
-        System.out.println("saved value\t" + newCustomer.toString());
         return custResponseMapper.entityToDto(newCustomer);
     }
 }

@@ -38,6 +38,7 @@ public class CustCreateRequestDto {
                 .custNum(custNum)
                 .custRgstDt(custRgstDt)
                 .custTypCd(custTypCd)
+                .birthDt(birthDt)
                 .build();
     }
 

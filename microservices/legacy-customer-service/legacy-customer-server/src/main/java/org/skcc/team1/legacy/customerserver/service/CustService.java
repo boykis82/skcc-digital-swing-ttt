@@ -11,6 +11,8 @@ import org.caltech.miniswing.exception.NotFoundDataException;
 import org.caltech.miniswing.util.AsyncHelper;
 import org.skcc.team1.legacy.customerserver.messaging.CustomerMessagePublisher;
 import org.skcc.team1.legacy.customerserver.messaging.MessageSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +26,10 @@ import static reactor.core.publisher.Mono.error;
 @Service
 @Slf4j
 public class CustService {
-    private final CustRepository custRepository;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private final CustRepository custRepository;
     private final CustomerMessagePublisher customerMessagePublisher;
 
     private final CustResponseMapper custResponseMapper;
@@ -65,14 +69,18 @@ public class CustService {
 
     @Transactional
     public CustResponseDto createCustomer(CustCreateRequestDto custCreateRequestDto) {
+
+        // Save Data (Transactional Required)
         Cust newCust = custCreateRequestMapper.dtoToEntity(custCreateRequestDto);
         newCust.setCustRgstDt(LocalDate.now());
         newCust = custRepository.save(newCust);
 
-        CustResponseDto custResponseDto = custResponseMapper.entityToDto(newCust);
+        // Build
+        CustResponseDto custResponseDto = newCust.toCustResponseDto();
+        logger.trace("SQS Message SENDING: \t" + custResponseDto.toString());
 
+        // Publish
         customerMessagePublisher.sendCustomerCreatedEvent(custResponseDto);
-
         return custResponseDto;
     }
 

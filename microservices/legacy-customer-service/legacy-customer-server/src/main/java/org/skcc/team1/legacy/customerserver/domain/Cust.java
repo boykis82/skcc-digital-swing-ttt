@@ -1,9 +1,7 @@
 package org.skcc.team1.legacy.customerserver.domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.skcc.team1.legacy.customerclient.dto.CustResponseDto;
 import org.skcc.team1.legacy.customerclient.dto.CustTypCd;
 import org.caltech.miniswing.domain.BaseEntity;
 
@@ -15,6 +13,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Table(name = "cust")
+@ToString
 public class Cust  extends BaseEntity {
     @Id
     @Column(name = "cust_num")
@@ -40,6 +39,16 @@ public class Cust  extends BaseEntity {
         this.custRgstDt = custRgstDt;
         this.birthDt    = birthDt;
         this.custTypCd  = custTypCd;
+    }
+
+    public CustResponseDto toCustResponseDto() {
+        return CustResponseDto.builder()
+                .custNum(getCustNum())
+                .custNm(custNm)
+                .birthDt(birthDt)
+                .custRgstDt(custRgstDt)
+                .custTypCd(custTypCd)
+                .build();
     }
 
     public long getCustNum() {
