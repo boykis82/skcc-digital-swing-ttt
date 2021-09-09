@@ -9,8 +9,8 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS_ABSOLUTE_PATH}/app.log</file>
-<!--        <file>/var/log/container/app.log</file>-->
+<!--        <file>${LOGS_ABSOLUTE_PATH}/app.log</file>-->
+        <file>/var/log/container/app.log</file>
         <encoder>
             <pattern>%msg%n</pattern>
         </encoder>
