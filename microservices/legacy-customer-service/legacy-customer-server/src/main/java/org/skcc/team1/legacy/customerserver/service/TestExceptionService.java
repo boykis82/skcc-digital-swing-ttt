@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class TestExceptionService {
 
     public void testExceptionTestFunction(String message) {
-        new TestException("Exception Occur Customer Number: "+ message);
+        new TestException("[CUST001] Exception Occur Customer Number: "+ message);
     }
 
 }
